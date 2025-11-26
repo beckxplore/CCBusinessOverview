@@ -27,6 +27,7 @@ from services.google_sheets import (
 from services.sheet_data import fetch_sheet_metrics, fetch_raw_sheet_data
 from services.sensitivity import compute_leader_sensitivity, compute_weekly_retention
 from services.b2b_mcp_client import get_b2b_mcp_client, format_date_range
+from services.b2b_purchase_price import get_b2b_purchase_price_service
 
 # Load environment variables
 load_dotenv()
@@ -2051,11 +2052,110 @@ async def get_b2b_profit_margin_analysis(
     date_from: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
     date_to: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
 ):
-    """Get B2B profit margin analysis: CM1, CM2, CM3 breakdown."""
+    """Get B2B profit margin analysis: CM1, CM2, CM3 breakdown with actual purchase prices."""
     try:
+        from datetime import datetime as dt
+        
         client = get_b2b_mcp_client()
+        purchase_price_service = get_b2b_purchase_price_service()
         date_range = format_date_range(date_from, date_to)
+        
+        # Get base profit margin analysis from MCP
         result = await client.call_tool("get_profit_margin_analysis", {"date_range": date_range})
+        
+        # Try to get product-level sales data to recalculate with actual purchase prices
+        try:
+            product_sales = await client.get_product_level_sales(date_from, date_to)
+            
+            # If we have product-level data, recalculate COGS with actual purchase prices
+            if product_sales and "items" in product_sales and len(product_sales["items"]) > 0:
+                total_actual_cogs = 0.0
+                purchase_price_stats = {
+                    "exact_date": 0,
+                    "latest_before": 0,
+                    "average": 0,
+                    "missing": 0
+                }
+                
+                for item in product_sales["items"]:
+                    product_name = item.get("product_name") or item.get("product_id", "")
+                    sale_date_str = item.get("sale_date") or item.get("order_date") or item.get("date")
+                    quantity_kg = float(item.get("quantity_kg") or item.get("quantity") or item.get("weight_kg") or 0.0)
+                    
+                    if not product_name or not sale_date_str or quantity_kg <= 0:
+                        continue
+                    
+                    # Parse sale date
+                    try:
+                        if isinstance(sale_date_str, str):
+                            sale_date = dt.strptime(sale_date_str.split("T")[0], "%Y-%m-%d").date()
+                        else:
+                            sale_date = sale_date_str
+                    except:
+                        continue
+                    
+                    # Get purchase price for this sale date (with next-day offset)
+                    purchase_price, source = purchase_price_service.get_purchase_price_for_sale_date(
+                        product_name, sale_date
+                    )
+                    
+                    if purchase_price > 0:
+                        total_actual_cogs += purchase_price * quantity_kg
+                        purchase_price_stats[source] = purchase_price_stats.get(source, 0) + 1
+                
+                # Recalculate margins with actual COGS
+                if total_actual_cogs > 0 and "summary" in result:
+                    original_cogs = float(result["summary"].get("product_cogs", 0))
+                    if original_cogs > 0:
+                        # Update COGS in summary
+                        result["summary"]["product_cogs"] = total_actual_cogs
+                        result["summary"]["original_product_cogs"] = original_cogs
+                        
+                        # Recalculate CM1, CM2, CM3
+                        total_revenue = float(result["summary"].get("total_revenue", 0))
+                        warehouse_costs = float(result["summary"].get("warehouse_costs", 0))
+                        delivery_costs = float(result["summary"].get("delivery_costs", 0))
+                        
+                        # CM1 = Revenue - Actual COGS
+                        cm1_amount = total_revenue - total_actual_cogs
+                        cm1_percent = (cm1_amount / total_revenue * 100) if total_revenue > 0 else 0
+                        
+                        # CM2 = CM1 - Warehouse Costs
+                        cm2_amount = cm1_amount - warehouse_costs
+                        cm2_percent = (cm2_amount / total_revenue * 100) if total_revenue > 0 else 0
+                        
+                        # CM3 = CM2 - Delivery Costs
+                        cm3_amount = cm2_amount - delivery_costs
+                        cm3_percent = (cm3_amount / total_revenue * 100) if total_revenue > 0 else 0
+                        
+                        # Update margin breakdown
+                        if "margin_breakdown" in result:
+                            result["margin_breakdown"]["cm1_gross_profit"]["amount"] = cm1_amount
+                            result["margin_breakdown"]["cm1_gross_profit"]["percentage"] = f"{cm1_percent:.2f}%"
+                            
+                            result["margin_breakdown"]["cm2_after_warehouse"]["amount"] = cm2_amount
+                            result["margin_breakdown"]["cm2_after_warehouse"]["percentage"] = f"{cm2_percent:.2f}%"
+                            
+                            result["margin_breakdown"]["cm3_net_profit"]["amount"] = cm3_amount
+                            result["margin_breakdown"]["cm3_net_profit"]["percentage"] = f"{cm3_percent:.2f}%"
+                        
+                        # Update summary
+                        result["summary"]["final_profit"] = cm3_amount
+                        result["summary"]["final_margin"] = f"{cm3_percent:.2f}%"
+                        
+                        # Add metadata about purchase price source
+                        result["purchase_price_metadata"] = {
+                            "cogs_recalculated": True,
+                            "purchase_price_sources": purchase_price_stats,
+                            "note": "CM1 recalculated using actual purchase prices from Google Sheets with next-day offset"
+                        }
+        except Exception as e:
+            logger.warning(f"Could not recalculate with purchase prices: {e}. Using MCP data as-is.")
+            result["purchase_price_metadata"] = {
+                "cogs_recalculated": False,
+                "note": "Purchase price recalculation not available. Using MCP-provided COGS."
+            }
+        
         return result
     except Exception as e:
         logger.error(f"Error fetching B2B profit margin analysis: {str(e)}")
@@ -2076,6 +2176,150 @@ async def get_b2b_cost_structure_analysis(
     except Exception as e:
         logger.error(f"Error fetching B2B cost structure analysis: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch B2B cost structure analysis: {str(e)}")
+
+
+@app.get("/api/b2b/product-profit-analysis")
+async def get_b2b_product_profit_analysis(
+    date_from: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
+    date_to: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
+):
+    """Get B2B per-product profit and volume analysis with actual purchase prices."""
+    try:
+        from datetime import datetime as dt
+        from collections import defaultdict
+        
+        client = get_b2b_mcp_client()
+        purchase_price_service = get_b2b_purchase_price_service()
+        date_range = format_date_range(date_from, date_to)
+        
+        # Try to get product-level sales data
+        product_sales = await client.get_product_level_sales(date_from, date_to)
+        
+        if not product_sales or "items" not in product_sales or len(product_sales.get("items", [])) == 0:
+            # If no product-level data, return empty structure
+            return {
+                "products": [],
+                "summary": {
+                    "total_products": 0,
+                    "total_revenue": 0,
+                    "total_profit": 0,
+                    "avg_profit_margin": 0
+                },
+                "period": date_range,
+                "error": "Product-level sales data not available from MCP endpoint"
+            }
+        
+        # Aggregate product data
+        product_data: Dict[str, Dict[str, Any]] = defaultdict(lambda: {
+            "product_name": "",
+            "total_revenue": 0.0,
+            "total_quantity_kg": 0.0,
+            "order_ids": set(),
+            "total_cogs": 0.0,
+            "warehouse_costs": 0.0,
+            "delivery_costs": 0.0,
+            "purchase_price_sources": defaultdict(int),
+            "days_with_data": set()
+        })
+        
+        # Process each item
+        for item in product_sales["items"]:
+            product_name = item.get("product_name") or item.get("product_id", "")
+            sale_date_str = item.get("sale_date") or item.get("order_date") or item.get("date")
+            quantity_kg = float(item.get("quantity_kg") or item.get("quantity") or item.get("weight_kg") or 0.0)
+            revenue = float(item.get("revenue") or item.get("subtotal") or item.get("price") or 0.0)
+            order_id = item.get("order_id") or item.get("id")
+            
+            if not product_name or quantity_kg <= 0:
+                continue
+            
+            # Parse sale date
+            try:
+                if isinstance(sale_date_str, str):
+                    sale_date = dt.strptime(sale_date_str.split("T")[0], "%Y-%m-%d").date()
+                else:
+                    sale_date = sale_date_str
+            except:
+                continue
+            
+            # Get purchase price for this sale date (with next-day offset)
+            purchase_price, source = purchase_price_service.get_purchase_price_for_sale_date(
+                product_name, sale_date
+            )
+            
+            # Aggregate data
+            prod = product_data[product_name]
+            prod["product_name"] = product_name
+            prod["total_revenue"] += revenue
+            prod["total_quantity_kg"] += quantity_kg
+            if order_id:
+                prod["order_ids"].add(str(order_id))  # Track unique order IDs
+            prod["total_cogs"] += purchase_price * quantity_kg
+            prod["purchase_price_sources"][source] += 1
+            prod["days_with_data"].add(sale_date)
+            
+            # Calculate warehouse and delivery costs (3 birr/kg and 2 birr/kg)
+            warehouse_cost = quantity_kg * 3.0
+            delivery_cost = quantity_kg * 2.0
+            prod["warehouse_costs"] += warehouse_cost
+            prod["delivery_costs"] += delivery_cost
+        
+        # Convert to list and calculate final metrics
+        products_list = []
+        total_revenue = 0.0
+        total_profit = 0.0
+        
+        for product_name, data in product_data.items():
+            revenue = data["total_revenue"]
+            cogs = data["total_cogs"]
+            warehouse = data["warehouse_costs"]
+            delivery = data["delivery_costs"]
+            profit = revenue - cogs - warehouse - delivery
+            margin = (profit / revenue * 100) if revenue > 0 else 0.0
+            profit_per_kg = (profit / data["total_quantity_kg"]) if data["total_quantity_kg"] > 0 else 0.0
+            
+            # Get average purchase price used
+            total_items = sum(data["purchase_price_sources"].values())
+            avg_purchase_price = (cogs / data["total_quantity_kg"]) if data["total_quantity_kg"] > 0 else 0.0
+            
+            products_list.append({
+                "product_name": product_name,
+                "total_revenue": round(revenue, 2),
+                "total_quantity_kg": round(data["total_quantity_kg"], 2),
+                "total_orders": len(data["order_ids"]),
+                "purchase_price_used": round(avg_purchase_price, 2),
+                "total_cogs": round(cogs, 2),
+                "warehouse_costs": round(warehouse, 2),
+                "delivery_costs": round(delivery, 2),
+                "total_profit": round(profit, 2),
+                "profit_margin_percent": round(margin, 2),
+                "profit_per_kg": round(profit_per_kg, 2),
+                "days_with_data": len(data["days_with_data"])
+            })
+            
+            total_revenue += revenue
+            total_profit += profit
+        
+        # Sort by profit (descending)
+        products_list.sort(key=lambda x: x["total_profit"], reverse=True)
+        
+        # Calculate summary
+        avg_margin = (total_profit / total_revenue * 100) if total_revenue > 0 else 0.0
+        
+        return {
+            "products": products_list,
+            "summary": {
+                "total_products": len(products_list),
+                "total_revenue": round(total_revenue, 2),
+                "total_profit": round(total_profit, 2),
+                "avg_profit_margin": round(avg_margin, 2)
+            },
+            "period": date_range
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching B2B product profit analysis: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch B2B product profit analysis: {str(e)}")
 
 
 @app.get("/api/b2b/revenue-trends")
