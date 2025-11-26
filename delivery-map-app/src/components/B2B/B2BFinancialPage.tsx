@@ -16,7 +16,7 @@ import type {
   B2BRevenueTrends,
   B2BCashFlowAnalysis
 } from '../../types';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
@@ -271,13 +271,13 @@ export const B2BFinancialPage: React.FC = () => {
                       cx="50%"
                       cy="50%"
                       outerRadius={80}
-                      label={({ name, value, percent }: any) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                      label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(1)}%`}
                     >
                       {[
                         { name: 'COGS', value: (costStructure as any).cost_breakdown.product_cogs?.amount || 0 },
                         { name: 'Warehouse', value: (costStructure as any).cost_breakdown.warehouse_handling?.amount || 0 },
                         { name: 'Delivery', value: (costStructure as any).cost_breakdown.last_mile_delivery?.amount || 0 }
-                      ].filter(item => item.value > 0).map((entry, index) => (
+                      ].filter(item => item.value > 0).map((_entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>

@@ -9,6 +9,7 @@ import type {
   PersonaLeader,
   SglRetentionResponse,
   BenchmarkLocationsResponse,
+  ProductCost,
 } from './types';
 import { DataProcessor } from './utils/dataProcessor';
 import { ApiClient } from './utils/apiClient';

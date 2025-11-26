@@ -173,11 +173,10 @@ export const OverviewPage: React.FC = () => {
   const regularVolume = products.reduce((sum, p) => sum + p.weekly_volume_kg, 0);
   
   // Get B2B totals if enabled
-  const b2bRevenue = includeB2B && b2bData?.overview?.total_revenue ? b2bData.overview.total_revenue : 0;
-  const b2bOrders = includeB2B && b2bData?.overview?.total_orders ? b2bData.overview.total_orders : 0;
-  const b2bProfit = includeB2B && b2bData?.overview?.total_profit ? b2bData.overview.total_profit : 0;
-  const b2bCost = includeB2B && b2bData?.costs ? 
-    (b2bData.costs.product_cogs + b2bData.costs.warehouse + b2bData.costs.delivery) : 0;
+  const b2bRevenue = includeB2B && b2bData?.revenue ? b2bData.revenue : 0;
+  const b2bOrders = includeB2B && b2bData?.orders ? b2bData.orders : 0;
+  const b2bProfit = includeB2B && b2bData?.profit ? b2bData.profit : 0;
+  const b2bCost = 0; // B2B costs not available in current interface
   
   // Combined totals
   const totalRevenue = regularRevenue + (includeB2B ? b2bRevenue : 0);

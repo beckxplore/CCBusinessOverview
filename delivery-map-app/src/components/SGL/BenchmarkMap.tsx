@@ -33,6 +33,7 @@ const getIconForCategory = (locationGroup: string): L.Icon => {
   
   // Create a custom icon with emoji
   return L.divIcon({
+    iconUrl: 'data:image/svg+xml,<svg></svg>', // Required for type compatibility
     className: 'custom-benchmark-icon',
     html: `<div style="
       background-color: ${config.color};
@@ -49,7 +50,7 @@ const getIconForCategory = (locationGroup: string): L.Icon => {
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
     popupAnchor: [0, -size / 2],
-  });
+  }) as L.Icon;
 };
 
 const formatLocationGroup = (group: string): string => {

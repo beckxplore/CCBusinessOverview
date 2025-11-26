@@ -8,7 +8,6 @@ import {
   DollarSign,
   Calendar,
   CreditCard,
-  BarChart3
 } from 'lucide-react';
 import type {
   B2BCustomerProfitability,
@@ -246,7 +245,7 @@ export const B2BCustomerPage: React.FC = () => {
                     outerRadius={80}
                     label={({ stage, percentage }: any) => `${stage}: ${percentage.toFixed(1)}%`}
                   >
-                    {(creditRisk as any).credit_stages.map((entry: any, index: number) => (
+                    {(creditRisk as any).credit_stages.map((_entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

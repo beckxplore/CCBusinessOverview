@@ -7,14 +7,13 @@ import {
   DollarSign,
   Calendar,
   BarChart3,
-  TrendingDown
 } from 'lucide-react';
 import type {
   B2BProductProfitAnalysis
 } from '../../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, ZAxis, Legend } from 'recharts';
 
-const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+// const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
 export const B2BProductPage: React.FC = () => {
   const [loading, setLoading] = useState(true);

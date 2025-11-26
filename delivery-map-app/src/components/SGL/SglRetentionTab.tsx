@@ -15,12 +15,6 @@ const formatWeekLabel = (iso: string) => {
   return `${weekdayFormatter.format(date)}, ${formatter.format(date)}`;
 };
 
-const formatNumber = (value?: number | null, digits = 1) => {
-  if (value === null || value === undefined || Number.isNaN(value)) {
-    return '—';
-  }
-  return value.toFixed(digits);
-};
 
 const formatPercent = (value?: number | null, digits = 1) => {
   if (value === null || value === undefined || Number.isNaN(value)) {
