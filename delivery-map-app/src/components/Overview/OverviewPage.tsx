@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { KPICard } from './KPICard';
 import { DataStore } from '../../utils/dataStore';
+import { ApiClient } from '../../utils/apiClient';
 import { formatCurrency, getProfitColor } from '../../utils/profitabilityCalc';
 import { InfoTooltip } from '../Common/InfoTooltip';
 import { 
@@ -8,9 +9,10 @@ import {
   TrendingUp, 
   TrendingDown, 
   Package, 
-  AlertTriangle 
+  AlertTriangle,
+  Building2
 } from 'lucide-react';
-import type { ProductProfitability } from '../../types';
+import type { ProductProfitability, B2BBusinessOverview } from '../../types';
 import { LeaderBasketInsights } from './LeaderBasketInsights';
 import { StapleProductGrid } from './StapleProductGrid';
 
@@ -30,6 +32,9 @@ export const OverviewPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<ProductProfitability[]>([]);
   const [lookbackDays, setLookbackDays] = useState<number>(30);
+  const [includeB2B, setIncludeB2B] = useState<boolean>(false);
+  const [b2bData, setB2bData] = useState<B2BBusinessOverview | null>(null);
+  const [b2bLoading, setB2bLoading] = useState(false);
   const [stapleSummaries, setStapleSummaries] = useState<
     Array<{
       product: string;
@@ -46,6 +51,14 @@ export const OverviewPage: React.FC = () => {
   useEffect(() => {
     loadOverview();
   }, []);
+
+  useEffect(() => {
+    if (includeB2B && DataStore.isLoaded()) {
+      loadB2BData();
+    } else if (!includeB2B) {
+      setB2bData(null);
+    }
+  }, [includeB2B]);
 
   const loadOverview = async () => {
     try {
@@ -99,10 +112,49 @@ export const OverviewPage: React.FC = () => {
         };
       });
       setStapleSummaries(staples);
+      
+      // If B2B toggle is already enabled, load B2B data now that DataStore is loaded
+      if (includeB2B) {
+        loadB2BData();
+      }
     } catch (error) {
       console.error('Failed to load overview:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadB2BData = async () => {
+    try {
+      setB2bLoading(true);
+      
+      // Get the same date range as the regular overview metrics
+      const metricsWindow = DataStore.getMetricsWindow();
+      let dateFrom: string;
+      let dateTo: string;
+      
+      if (metricsWindow && metricsWindow.start && metricsWindow.end) {
+        // Use the exact same window as regular metrics
+        dateFrom = metricsWindow.start;
+        dateTo = metricsWindow.end;
+      } else {
+        // Fallback: use lookback days if window is not available
+        const lookbackDays = DataStore.getMetricsLookbackDays();
+        const today = new Date();
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - lookbackDays);
+        
+        dateFrom = startDate.toISOString().split('T')[0];
+        dateTo = today.toISOString().split('T')[0];
+      }
+      
+      const data = await ApiClient.getB2BBusinessOverview(dateFrom, dateTo);
+      setB2bData(data);
+    } catch (error) {
+      console.error('Failed to load B2B data:', error);
+      setB2bData(null);
+    } finally {
+      setB2bLoading(false);
     }
   };
 
@@ -114,10 +166,25 @@ export const OverviewPage: React.FC = () => {
     );
   }
 
-  const totalRevenue = products.reduce((sum, p) => sum + p.weekly_revenue, 0);
-  const totalCost = products.reduce((sum, p) => sum + (p.total_cost * p.weekly_volume_kg), 0);
-  const totalProfit = products.reduce((sum, p) => sum + p.weekly_profit, 0);
-  const totalVolume = products.reduce((sum, p) => sum + p.weekly_volume_kg, 0);
+  // Calculate regular (non-B2B) totals
+  const regularRevenue = products.reduce((sum, p) => sum + p.weekly_revenue, 0);
+  const regularCost = products.reduce((sum, p) => sum + (p.total_cost * p.weekly_volume_kg), 0);
+  const regularProfit = products.reduce((sum, p) => sum + p.weekly_profit, 0);
+  const regularVolume = products.reduce((sum, p) => sum + p.weekly_volume_kg, 0);
+  
+  // Get B2B totals if enabled
+  const b2bRevenue = includeB2B && b2bData?.overview?.total_revenue ? b2bData.overview.total_revenue : 0;
+  const b2bOrders = includeB2B && b2bData?.overview?.total_orders ? b2bData.overview.total_orders : 0;
+  const b2bProfit = includeB2B && b2bData?.overview?.total_profit ? b2bData.overview.total_profit : 0;
+  const b2bCost = includeB2B && b2bData?.costs ? 
+    (b2bData.costs.product_cogs + b2bData.costs.warehouse + b2bData.costs.delivery) : 0;
+  
+  // Combined totals
+  const totalRevenue = regularRevenue + (includeB2B ? b2bRevenue : 0);
+  const totalCost = regularCost + (includeB2B ? b2bCost : 0);
+  const totalProfit = regularProfit + (includeB2B ? b2bProfit : 0);
+  const totalVolume = regularVolume; // B2B volume is separate, not combined
+  
   const profitableCount = products.filter(p => p.margin_per_kg > 0).length;
   const losingCount = products.filter(p => p.margin_per_kg < 0).length;
 
@@ -133,26 +200,72 @@ export const OverviewPage: React.FC = () => {
 
   return (
     <div className="h-full overflow-auto bg-gray-50 p-6 space-y-6">
+      {/* B2B Toggle */}
+      <div className="bg-white rounded-lg shadow p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Building2 className="text-gray-600" size={20} />
+          <div>
+            <label className="text-sm font-medium text-gray-700 cursor-pointer" htmlFor="b2b-toggle">
+              Include B2B Data
+            </label>
+            <p className="text-xs text-gray-500">
+              Add B2B revenue, orders, and profit to overview totals
+              {DataStore.getMetricsWindow() && (
+                <span className="ml-1">
+                  (same time period: {new Date(DataStore.getMetricsWindow()!.start).toLocaleDateString()} - {new Date(DataStore.getMetricsWindow()!.end).toLocaleDateString()})
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            id="b2b-toggle"
+            checked={includeB2B}
+            onChange={(e) => setIncludeB2B(e.target.checked)}
+            className="sr-only peer"
+          />
+          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+        {includeB2B && b2bLoading && (
+          <div className="ml-4">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+          </div>
+        )}
+        {includeB2B && b2bData && (
+          <div className="ml-4 text-sm text-gray-600">
+            <span className="font-semibold">B2B:</span> {formatCurrency(b2bRevenue, 0)} ETB revenue, {b2bOrders} orders
+          </div>
+        )}
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-6">
         <KPICard
           title="Weekly Revenue"
           value={`${formatCurrency(totalRevenue, 2)} ETB`}
-          subtitle={`${formatCurrency(totalRevenue, 2)} ETB total`}
+          subtitle={includeB2B && b2bData ? 
+            `${formatCurrency(regularRevenue, 0)} regular + ${formatCurrency(b2bRevenue, 0)} B2B` :
+            `${formatCurrency(totalRevenue, 2)} ETB total`}
           icon={DollarSign}
           color="blue"
         />
         <KPICard
           title="Weekly Cost"
           value={`${formatCurrency(totalCost, 2)} ETB`}
-          subtitle={`${formatCurrency(totalCost, 2)} ETB total`}
+          subtitle={includeB2B && b2bData ? 
+            `${formatCurrency(regularCost, 0)} regular + ${formatCurrency(b2bCost, 0)} B2B` :
+            `${formatCurrency(totalCost, 2)} ETB total`}
           icon={TrendingDown}
           color="purple"
         />
         <KPICard
           title="Weekly Profit/Loss"
           value={`${formatCurrency(totalProfit, 2)} ETB`}
-          subtitle={`${formatCurrency(totalProfit, 2)} ETB total`}
+          subtitle={includeB2B && b2bData ? 
+            `${formatCurrency(regularProfit, 0)} regular + ${formatCurrency(b2bProfit, 0)} B2B` :
+            `${formatCurrency(totalProfit, 2)} ETB total`}
           icon={TrendingUp}
           color={totalProfit >= 0 ? 'green' : 'red'}
         />
