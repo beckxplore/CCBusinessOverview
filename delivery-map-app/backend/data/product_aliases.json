@@ -1,0 +1,271 @@
+[
+  {
+    "canonical": "AL-Hinan flour",
+    "order_variants": ["AL-Hinan flour"],
+    "benchmark_variants": ["AL-Hinan flour"],
+    "distribution_variants": ["AL-Hinan flour"]
+  },
+  {
+    "canonical": "Apple",
+    "order_variants": ["Apple"],
+    "benchmark_variants": ["Apple"],
+    "distribution_variants": ["Apple"]
+  },
+  {
+    "canonical": "Apple Mango",
+    "order_variants": ["Apple Mango", "Mango Apple"],
+    "benchmark_variants": ["Apple Mango", "Mango Apple"],
+    "distribution_variants": ["Apple Mango", "Mango Apple"]
+  },
+  {
+    "canonical": "Avocado",
+    "order_variants": ["Avocado", "Avocado A", "Avocado B", "Avocado Shekaraw"],
+    "benchmark_variants": ["Avocado", "Avocado A", "Avocado B", "Avocado Shekaraw"],
+    "distribution_variants": ["Avocado", "Avocado A", "Avocado B", "Avocado Shekaraw"]
+  },
+  {
+    "canonical": "Banana",
+    "order_variants": ["Banana"],
+    "benchmark_variants": ["Banana"],
+    "distribution_variants": ["Banana"]
+  },
+  {
+    "canonical": "Beetroot",
+    "order_variants": ["Beetroot", "Beet root"],
+    "benchmark_variants": ["Beetroot", "Beet root"],
+    "distribution_variants": ["Beetroot", "Beet root"]
+  },
+  {
+    "canonical": "Black Lion Tea (80g)",
+    "order_variants": ["Black Lion Tea (80g)"],
+    "benchmark_variants": ["Black Lion Tea (80g)"],
+    "distribution_variants": ["Black Lion Tea (80g)"]
+  },
+  {
+    "canonical": "Broccoli",
+    "order_variants": ["Broccoli", "Broccolis"],
+    "benchmark_variants": ["Broccoli", "Broccolis"],
+    "distribution_variants": ["Broccoli", "Broccolis"]
+  },
+  {
+    "canonical": "Carrot",
+    "order_variants": ["Carrot", "Carrot B"],
+    "benchmark_variants": ["Carrot", "Carrot B"],
+    "distribution_variants": ["Carrot", "Carrot B"]
+  },
+  {
+    "canonical": "Chili Green",
+    "order_variants": ["Chili Green", "Chilly Green", "Chilly Green (Starta)", "Chilly Green (Starter)", "Chilly Green (Elfora)", "Chilly Green Elfora", "Green chili starta"],
+    "benchmark_variants": ["Chili Green", "Chilly Green", "Chilly Green (Starta)", "Chilly Green (Starter)", "Chilly Green (Elfora)", "Chilly Green Elfora"],
+    "distribution_variants": ["Chili Green", "Chilly Green", "Chilly Green (Starta)", "Chilly Green (Starter)", "Chilly Green (Elfora)", "Chilly Green Elfora"]
+  },
+  {
+    "canonical": "Corn",
+    "order_variants": ["Corn"],
+    "benchmark_variants": ["Corn"],
+    "distribution_variants": ["Corn"]
+  },
+  {
+    "canonical": "Cucumber",
+    "order_variants": ["Cucumber"],
+    "benchmark_variants": ["Cucumber"],
+    "distribution_variants": ["Cucumber"]
+  },
+  {
+    "canonical": "Eggplant",
+    "order_variants": ["Eggplant", "Egg plant"],
+    "benchmark_variants": ["Eggplant", "Egg plant"],
+    "distribution_variants": ["Eggplant", "Egg plant"]
+  },
+  {
+    "canonical": "Garlic",
+    "order_variants": ["Garlic", "Garlic (የተፈለፈለ)", "Garlic B"],
+    "benchmark_variants": ["Garlic", "Garlic B"],
+    "distribution_variants": ["Garlic", "Garlic B"]
+  },
+  {
+    "canonical": "Ginger",
+    "order_variants": ["Ginger"],
+    "benchmark_variants": ["Ginger"],
+    "distribution_variants": ["Ginger"]
+  },
+  {
+    "canonical": "Green Beans",
+    "order_variants": ["Green Beans", "Grean Beans", "Fossolia"],
+    "benchmark_variants": ["Green Beans", "Grean Beans", "Fossolia"],
+    "distribution_variants": ["Green Beans", "Grean Beans", "Fossolia"]
+  },
+  {
+    "canonical": "Lemon",
+    "order_variants": ["Lemon", "lemon", "Lomen"],
+    "benchmark_variants": ["Lemon", "lemon", "Lomen"],
+    "distribution_variants": ["Lemon", "lemon", "Lomen"]
+  },
+  {
+    "canonical": "Mango",
+    "order_variants": ["Mango", "Ye Habesha Mango", "Ye Habeshaa Mango"],
+    "benchmark_variants": ["Mango", "Ye Habesha Mango", "Ye Habeshaa Mango"],
+    "distribution_variants": ["Mango", "Ye Habesha Mango", "Ye Habeshaa Mango"]
+  },
+  {
+    "canonical": "Moon Coffee Biscuit",
+    "order_variants": ["Moon Coffee Biscuit"],
+    "benchmark_variants": ["Moon Coffee Biscuit", "Moon Strawberry Biscuit"],
+    "distribution_variants": ["Moon Coffee Biscuit"]
+  },
+  {
+    "canonical": "My Kishen Mekelesha (2g)",
+    "order_variants": ["My Kishen Mekelesha (2g)"],
+    "benchmark_variants": ["My Kishen Mekelesha (2g)"],
+    "distribution_variants": ["My Kishen Mekelesha (2g)"]
+  },
+  {
+    "canonical": "Orange Valencia",
+    "order_variants": ["Orange Valencia", "Valencia Orange", "orange Valencia", "Orange", "Orange Yerer", "Yerer Orange"],
+    "benchmark_variants": ["Orange Valencia", "Valencia Orange", "orange Valencia"],
+    "distribution_variants": ["Orange Valencia", "Valencia Orange", "orange Valencia"]
+  },
+  {
+    "canonical": "Papaya",
+    "order_variants": ["Papaya", "Papaya B"],
+    "benchmark_variants": ["Papaya", "Papaya B"],
+    "distribution_variants": ["Papaya", "Papaya B"]
+  },
+  {
+    "canonical": "Pineapple",
+    "order_variants": ["Pineapple", "pineapple", "Pineapple B"],
+    "benchmark_variants": ["Pineapple", "pineapple", "Pineapple B"],
+    "distribution_variants": ["Pineapple", "pineapple", "Pineapple B"]
+  },
+  {
+    "canonical": "Potato",
+    "order_variants": ["Potato", "Potatoes", "Potato Chips", "Potatoes Chips", "Potatoes Restaurant quality", "Potatoes Restaurant Quality"],
+    "benchmark_variants": ["Potato", "Potatoes"],
+    "distribution_variants": ["Potato", "Potatoes", "Potatoes Chips"]
+  },
+  {
+    "canonical": "Potato for Chips",
+    "order_variants": ["Potato for Chips"],
+    "benchmark_variants": ["Potato for Chips"],
+    "distribution_variants": ["Potato for Chips"]
+  },
+  {
+    "canonical": "Red Onion",
+    "order_variants": [
+      "Red Onion",
+      "Red Onion (ሃበሻ)",
+      "Red onion ( ሃበሻ )",
+      "Red Onion (ቀላፎ)",
+      "Red Onion A",
+      "Red Onion Grade A",
+      "Red Onion Grade A Restaurant q",
+      "Red Onion Grade A Restaurant quality"
+    ],
+    "benchmark_variants": [
+      "Red Onion",
+      "Red onion ( ሃበሻ )",
+      "Red Onion A",
+      "Red Onion Grade A",
+      "Red Onion Grade A Restaurant q",
+      "Red Onion Grade A Restaurant quality"
+    ],
+    "distribution_variants": [
+      "Red Onion",
+      "Red onion ( ሃበሻ )",
+      "Red Onion (ቀላፎ)",
+      "Red Onion A",
+      "Red Onion Grade A"
+    ]
+  },
+  {
+    "canonical": "Red Onion B",
+    "order_variants": ["Red Onion B", "Red Onion Grade B"],
+    "benchmark_variants": ["Red Onion B", "Red Onion Grade B"],
+    "distribution_variants": ["Red Onion B", "Red Onion Grade B"]
+  },
+  {
+    "canonical": "Red Onion C",
+    "order_variants": ["Red Onion C", "Red Onion Grade C"],
+    "benchmark_variants": ["Red Onion C", "Red Onion Grade C"],
+    "distribution_variants": ["Red Onion C", "Red Onion Grade C"]
+  },
+  {
+    "canonical": "Red Onion Elfora",
+    "order_variants": ["Red Onion Elfora", "Red onion Elfora"],
+    "benchmark_variants": ["Red Onion Elfora"],
+    "distribution_variants": ["Red Onion Elfora", "Red onion Elfora"]
+  },
+  {
+    "canonical": "Red Onion Qelafo",
+    "order_variants": ["Red Onion Qelafo"],
+    "benchmark_variants": ["Red Onion Qelafo"],
+    "distribution_variants": ["Red Onion Qelafo"]
+  },
+  {
+    "canonical": "Rice",
+    "order_variants": ["Rice"],
+    "benchmark_variants": ["Rice"],
+    "distribution_variants": ["Rice"]
+  },
+  {
+    "canonical": "Rosa Pasta",
+    "order_variants": ["Rosa Pasta"],
+    "benchmark_variants": ["Rosa Pasta"],
+    "distribution_variants": ["Rosa Pasta"]
+  },
+  {
+    "canonical": "Simba Tomato Paste",
+    "order_variants": ["Simba Tomato Paste"],
+    "benchmark_variants": ["Simba Tomato Paste"],
+    "distribution_variants": ["Simba Tomato Paste"]
+  },
+  {
+    "canonical": "Small Red Onion",
+    "order_variants": ["Small Red Onion"],
+    "benchmark_variants": ["Small Red Onion"],
+    "distribution_variants": ["Small Red Onion"]
+  },
+  {
+    "canonical": "Strawberry",
+    "order_variants": ["Strawberry"],
+    "benchmark_variants": ["Strawberry"],
+    "distribution_variants": ["Strawberry"]
+  },
+  {
+    "canonical": "Sweet Potato",
+    "order_variants": ["Sweet Potato", "Sweet Potatoes", "sweet potato"],
+    "benchmark_variants": ["Sweet Potato", "Sweet Potatoes"],
+    "distribution_variants": ["Sweet Potato", "Sweet Potatoes"]
+  },
+  {
+    "canonical": "Tomato",
+    "order_variants": ["Tomato", "Tomatoes"],
+    "benchmark_variants": ["Tomato", "Tomatoes"],
+    "distribution_variants": ["Tomato", "Tomatoes"]
+  },
+  {
+    "canonical": "Tomato B",
+    "order_variants": ["Tomato B", "Tomatoes Grade B", "Tomatoes B"],
+    "benchmark_variants": ["Tomato B", "Tomatoes Grade B", "Tomatoes B"],
+    "distribution_variants": ["Tomato B", "Tomatoes Grade B", "Tomatoes B"]
+  },
+  {
+    "canonical": "Tomato Restaurant Quality",
+    "order_variants": ["Tomato Restaurant Quality"],
+    "benchmark_variants": ["Tomato Restaurant Quality"],
+    "distribution_variants": ["Tomato Restaurant Quality"]
+  },
+  {
+    "canonical": "White cabbage",
+    "order_variants": ["White cabbage", "White Cabbage", "White Cabbage B", "White Cabbage (Large)", "White Cabbage (Small)", "whitecabbage"],
+    "benchmark_variants": ["White Cabbage", "White cabbage", "White Cabbage B", "White Cabbage (Large)", "White Cabbage (Small)", "whitecabbage"],
+    "distribution_variants": ["White cabbage", "White Cabbage", "White Cabbage B", "White Cabbage (Large)", "White Cabbage (Small)"]
+  },
+  {
+    "canonical": "Zucchini",
+    "order_variants": ["Zucchini", "Courgetti", "Courgette"],
+    "benchmark_variants": ["Zucchini", "Courgette"],
+    "distribution_variants": ["Zucchini", "Courgette"]
+  }
+]
+

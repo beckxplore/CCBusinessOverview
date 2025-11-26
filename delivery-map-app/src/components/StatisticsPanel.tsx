@@ -29,7 +29,8 @@ export const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ statistics, fi
     totalOrders: normalGroupsData.reduce((sum, item) => sum + (item.total_orders || 0), 0),
     totalGroups: normalGroupsData.reduce((sum, item) => sum + (item.total_groups || 0), 0),
     uniqueLeaders: new Set(normalGroupsData.map(item => item.group_created_by)).size,
-    totalMembers: normalGroupsData.reduce((sum, item) => sum + (item.unique_group_members || 0), 0)
+    totalMembers: normalGroupsData.reduce((sum, item) => sum + (item.unique_group_members || 0), 0),
+    totalLocations: normalGroupsData.length // Number of unique locations (blue circles on map)
   };
 
   // Calculate Super Groups metrics
@@ -38,7 +39,8 @@ export const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ statistics, fi
     totalOrders: superGroupsData.reduce((sum, item) => sum + (item.total_orders || 0), 0),
     totalGroups: superGroupsData.reduce((sum, item) => sum + (item.total_groups || 0), 0),
     uniqueLeaders: new Set(superGroupsData.map(item => item.group_created_by)).size,
-    totalMembers: superGroupsData.reduce((sum, item) => sum + (item.unique_group_members || 0), 0)
+    totalMembers: superGroupsData.reduce((sum, item) => sum + (item.unique_group_members || 0), 0),
+    totalLocations: superGroupsData.length // Number of unique locations (red circles on map)
   };
 
   return (
@@ -70,15 +72,30 @@ export const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ statistics, fi
             <div className="text-xl font-bold text-green-900">{normalGroupsStats.totalGroups.toLocaleString()}</div>
             <div className="text-xs text-green-700">Total Groups</div>
           </div>
-          <div className="text-center p-3 bg-purple-50 rounded-lg">
+          <div className="text-center p-3 bg-purple-50 rounded-lg" title="Unique people/accounts leading Normal Groups">
             <div className="text-xl font-bold text-purple-900">{normalGroupsStats.uniqueLeaders.toLocaleString()}</div>
             <div className="text-xs text-purple-700">Group Leaders</div>
+            <div className="text-xs text-purple-500 mt-1">👤 Unique people</div>
           </div>
-          <div className="text-center p-3 bg-orange-50 rounded-lg">
+          <div className="text-center p-3 bg-cyan-50 rounded-lg" title="Number of blue circles on the map">
+            <div className="text-xl font-bold text-cyan-900">{normalGroupsStats.totalLocations.toLocaleString()}</div>
+            <div className="text-xs text-cyan-700">Delivery Locations</div>
+            <div className="text-xs text-cyan-500 mt-1">🔵 Blue circles</div>
+          </div>
+          <div className="text-center p-3 bg-orange-50 rounded-lg col-span-2">
             <div className="text-xl font-bold text-orange-900">{normalGroupsStats.totalMembers.toLocaleString()}</div>
             <div className="text-xs text-orange-700">Active Members</div>
           </div>
         </div>
+        
+        {/* Helpful explanation */}
+        {normalGroupsStats.uniqueLeaders > 0 && normalGroupsStats.totalLocations > normalGroupsStats.uniqueLeaders && (
+          <div className="mt-3 p-2 bg-blue-50 rounded border border-blue-200">
+            <p className="text-xs text-blue-800">
+              💡 <strong>{normalGroupsStats.uniqueLeaders}</strong> leader{normalGroupsStats.uniqueLeaders !== 1 ? 's' : ''} operating in <strong>{normalGroupsStats.totalLocations}</strong> location{normalGroupsStats.totalLocations !== 1 ? 's' : ''}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Super Groups Dashboard */}
@@ -93,15 +110,31 @@ export const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ statistics, fi
             <div className="text-xl font-bold text-yellow-900">{superGroupsStats.totalGroups.toLocaleString()}</div>
             <div className="text-xs text-yellow-700">Total Groups</div>
           </div>
-          <div className="text-center p-3 bg-indigo-50 rounded-lg">
+          <div className="text-center p-3 bg-indigo-50 rounded-lg" title="Unique people/accounts leading Super Groups">
             <div className="text-xl font-bold text-indigo-900">{superGroupsStats.uniqueLeaders.toLocaleString()}</div>
             <div className="text-xs text-indigo-700">Group Leaders</div>
+            <div className="text-xs text-indigo-500 mt-1">👤 Unique people</div>
           </div>
-          <div className="text-center p-3 bg-pink-50 rounded-lg">
+          <div className="text-center p-3 bg-purple-50 rounded-lg" title="Number of red circles on the map">
+            <div className="text-xl font-bold text-purple-900">{superGroupsStats.totalLocations.toLocaleString()}</div>
+            <div className="text-xs text-purple-700">Delivery Locations</div>
+            <div className="text-xs text-purple-500 mt-1">🔴 Red circles</div>
+          </div>
+          <div className="text-center p-3 bg-pink-50 rounded-lg col-span-2">
             <div className="text-xl font-bold text-pink-900">{superGroupsStats.totalMembers.toLocaleString()}</div>
             <div className="text-xs text-pink-700">Active Members</div>
           </div>
         </div>
+        
+        {/* Helpful explanation */}
+        {superGroupsStats.uniqueLeaders > 0 && superGroupsStats.totalLocations > superGroupsStats.uniqueLeaders && (
+          <div className="mt-3 p-2 bg-blue-50 rounded border border-blue-200">
+            <p className="text-xs text-blue-800">
+              💡 <strong>{superGroupsStats.uniqueLeaders}</strong> leader{superGroupsStats.uniqueLeaders !== 1 ? 's' : ''} operating in <strong>{superGroupsStats.totalLocations}</strong> location{superGroupsStats.totalLocations !== 1 ? 's' : ''} 
+              {superGroupsStats.uniqueLeaders === 1 && ` (avg ${Math.round(superGroupsStats.totalLocations / superGroupsStats.uniqueLeaders)} locations per leader)`}
+            </p>
+          </div>
+        )}
       </div>
 
     </div>

@@ -4,7 +4,7 @@ import { Search, Filter, SlidersHorizontal, MapPin } from 'lucide-react';
 
 interface MapControlsProps {
   filters: FilterOptions;
-  onFilterChange: (filters: Partial<FilterOptions>) => void;
+  onFilterChange: (_filters: Partial<FilterOptions>) => void;
   statistics: Statistics | null;
   onResetMapView?: () => void;
 }

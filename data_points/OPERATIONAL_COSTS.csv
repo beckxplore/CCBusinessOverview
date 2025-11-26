@@ -1,0 +1,17 @@
+cost_category,cost_per_kg,description,optimization_potential
+Loading/Unloading,0.40,Manual labor,Low
+Warehouse Utilities,0.40,Electricity/water,Medium
+Warehouse Rent,0.62,Monthly lease,Medium
+Warehouse Personnel,1.49,Full-time staff,Low
+Warehouse OT,0.43,Overtime wages,Medium
+Daily Labour,0.12,Casual workers,Low
+PP Bags,2.53,Packaging materials,High
+Stickers,0.33,Product labels,Medium
+Petty Cash,0.04,Misc expenses,Low
+Car Rental,3.40,Vehicle costs,High
+Assistant Payment,0.24,Helper wages,Low
+Refuel,3.01,Fuel costs,High
+Packages,0.04,Internet/calls,Low
+Driver Incentive,0.13,Performance bonus,Low
+Traffic Penalty,0.02,Fines,Low
+

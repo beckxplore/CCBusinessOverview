@@ -64,7 +64,22 @@ def parse_csv_line(line: str) -> List[str]:
 def load_csv_data() -> List[Dict[str, Any]]:
     """Load data from CSV file."""
     try:
-        csv_path = '/Users/tesfa/Documents/SGL/sqllab_query_chipchipall_data_20251025T131225.csv'
+        # Try multiple possible paths for the CSV file
+        possible_paths = [
+            '../public/data.csv',
+            '../../delivery-map-app/public/data.csv',
+            os.path.join(os.path.dirname(__file__), '..', 'public', 'data.csv'),
+            'D:/Beck/AI/2025/SGL/delivery-map-app/public/data.csv'
+        ]
+        
+        csv_path = None
+        for path in possible_paths:
+            if os.path.exists(path):
+                csv_path = path
+                break
+        
+        if not csv_path:
+            csv_path = possible_paths[0]  # Default to first path for error message
         
         if not os.path.exists(csv_path):
             raise FileNotFoundError(f"CSV file not found: {csv_path}")
@@ -99,6 +114,20 @@ def load_csv_data() -> List[Dict[str, Any]]:
                 lat, lon = parse_coordinates(item.get('delivery_coordinates', ''))
                 item['latitude'] = lat
                 item['longitude'] = lon
+                
+                # Add new fields with default values if not in CSV
+                if 'leader_name' not in item:
+                    item['leader_name'] = None
+                if 'leader_phone' not in item:
+                    item['leader_phone'] = None
+                if 'total_kg' not in item:
+                    item['total_kg'] = 0.0
+                if 'last_order_date' not in item:
+                    item['last_order_date'] = None
+                if 'products_ordered' not in item:
+                    item['products_ordered'] = 0
+                if 'avg_kg_per_ordering_day' not in item:
+                    item['avg_kg_per_ordering_day'] = 0.0
                 
                 data.append(item)
         
@@ -193,4 +222,4 @@ async def get_statistics():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8002)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

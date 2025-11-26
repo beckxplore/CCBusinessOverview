@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: delivery-map-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: CLICKHOUSE_HOST
+        sync: false
+      - key: CLICKHOUSE_PORT_STR
+        sync: false
+      - key: CLICKHOUSE_USER
+        sync: false
+      - key: CLICKHOUSE_PASSWORD
+        sync: false
+      - key: CLICKHOUSE_DATABASE
+        sync: false
+      - key: CLICKHOUSE_SECURE_STR
+        sync: false
+      - key: CLICKHOUSE_VERIFY_STR
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_FILE
+        sync: false
+      - key: GOOGLE_SHEETS_CACHE_TTL
+        value: "600"
+      - key: GSHEET_PROCUREMENT_ID
+        sync: false
+      - key: GSHEET_PROCUREMENT_WORKSHEET
+        value: "ProcurementCosts"
+      - key: GSHEET_LOCAL_PRICE_ID
+        sync: false
+      - key: GSHEET_LOCAL_PRICE_WORKSHEET
+        value: "LocalShopPrices"
+      - key: GSHEET_OPERATIONAL_COST_ID
+        sync: false
+      - key: GSHEET_OPERATIONAL_COST_WORKSHEET
+        value: "OperationalCosts"
+      - key: BENCHMARK_API_URL
+        sync: false
+      - key: BENCHMARK_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+

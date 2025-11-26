@@ -1,0 +1,10 @@
+product_name,procurement_cost,operational_cost,sgl_commission,regular_commission,selling_price,notes
+Potato,19.00,13.33,2.00,0.00,25.00,Major loss product
+Avocado,95.00,13.33,5.00,0.00,105.00,High procurement cost
+Red Onion A,29.00,13.33,3.00,0.00,39.00,Medium volume
+Carrot,41.00,13.33,5.00,0.00,59.00,Near break-even
+Beetroot,26.00,13.33,5.00,0.00,33.00,Losing product
+Sweet Potato,27.00,13.33,5.00,0.00,39.00,Losing product
+Tomato,59.00,13.33,5.00,0.00,69.00,Losing product
+Papaya,60.00,13.33,5.00,0.00,69.00,Losing product
+

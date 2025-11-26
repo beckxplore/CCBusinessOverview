@@ -1,0 +1,157 @@
+{
+  "analysis_date": "2025-10-27T14:55:31.918821",
+  "current_model": {
+    "total_orders": 154566,
+    "revenue": 11369126.274454024,
+    "operational_costs": 13706773.996743543,
+    "gross_profit": -2337647.7222895194,
+    "profit_margin_pct": -20.561366510125946
+  },
+  "proposed_model": {
+    "total_orders": 90247,
+    "revenue": 6638132.18230822,
+    "operational_costs": 4152203.6523044263,
+    "incentive_costs": 1229904.75,
+    "total_costs": 5382108.402304426,
+    "gross_profit": 1256023.780003794,
+    "profit_margin_pct": 18.92134331629184
+  },
+  "profit_improvement": {
+    "monthly": 3593671.5022933134,
+    "annual": 43124058.02751976,
+    "percentage": -153.73024207315675
+  },
+  "initial_investment": 875000,
+  "break_even_months": 0.2434835792424588,
+  "year1_roi": 953.9162761933172,
+  "top_15_leaders": [
+    {
+      "rank": 1,
+      "name": "azmeraw",
+      "phone": "251930006493",
+      "orders": 1996,
+      "kg": 6167.0
+    },
+    {
+      "rank": 2,
+      "name": "mulu abeje",
+      "phone": "251921534264",
+      "orders": 1506,
+      "kg": 7750.0
+    },
+    {
+      "rank": 3,
+      "name": "yared",
+      "phone": "251928209003",
+      "orders": 1174,
+      "kg": 3350.0
+    },
+    {
+      "rank": 4,
+      "name": "rabia",
+      "phone": "251930306676",
+      "orders": 1166,
+      "kg": 3071.0
+    },
+    {
+      "rank": 5,
+      "name": "kira",
+      "phone": "251964041591",
+      "orders": 915,
+      "kg": 6588.0
+    },
+    {
+      "rank": 6,
+      "name": "Tigst Workee",
+      "phone": "251939241323",
+      "orders": 896,
+      "kg": 1950.0
+    },
+    {
+      "rank": 7,
+      "name": "Enqu",
+      "phone": "251937971909",
+      "orders": 791,
+      "kg": 1632.0
+    },
+    {
+      "rank": 8,
+      "name": "zenebe",
+      "phone": "251930000428",
+      "orders": 785,
+      "kg": 2207.0
+    },
+    {
+      "rank": 9,
+      "name": "xxx",
+      "phone": "251938246443",
+      "orders": 757,
+      "kg": 3387.0
+    },
+    {
+      "rank": 10,
+      "name": "Robel",
+      "phone": "251970666147",
+      "orders": 750,
+      "kg": 14360.0
+    },
+    {
+      "rank": 11,
+      "name": "hibist",
+      "phone": "251922874573",
+      "orders": 685,
+      "kg": 1010.0
+    },
+    {
+      "rank": 12,
+      "name": "ibrahim",
+      "phone": "251960234342",
+      "orders": 663,
+      "kg": 1010.0
+    },
+    {
+      "rank": 13,
+      "name": "Tsega",
+      "phone": "251919044924",
+      "orders": 561,
+      "kg": 1282.0
+    },
+    {
+      "rank": 14,
+      "name": "Habtamu",
+      "phone": "251943589764",
+      "orders": 557,
+      "kg": 2052.0
+    },
+    {
+      "rank": 15,
+      "name": "ህብሩ",
+      "phone": "251953226777",
+      "orders": 551,
+      "kg": 3970.0
+    }
+  ],
+  "recommendations": {
+    "phase1": {
+      "duration": "2 months",
+      "leaders": 3,
+      "days": "Monday only",
+      "orders": 15456,
+      "profit": 193908.35019157024
+    },
+    "phase2": {
+      "duration": "4 months",
+      "leaders": 10,
+      "days": "Mon, Wed, Fri",
+      "orders": 46369,
+      "profit": 535368.5964048216
+    },
+    "phase3": {
+      "duration": "6 months",
+      "leaders": 15,
+      "days": "Full week",
+      "orders": 77283,
+      "profit": 969579.388448183
+    }
+  }
+}
