@@ -101,6 +101,56 @@ class B2BMCPClient:
             logger.error(f"Unexpected error calling {tool_name}: {str(e)}")
             raise
     
+    async def get_product_level_sales(
+        self,
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Fetch product-level B2B sales data from MCP endpoint.
+        Uses get_product_profitability_ranking which returns aggregated product data.
+        
+        Args:
+            date_from: Start date (YYYY-MM-DD) or None for default
+            date_to: End date (YYYY-MM-DD) or None for today
+            
+        Returns:
+            Product-level sales data with items containing:
+            - product_name or product_id
+            - total_quantity_sold (in units, may need conversion to kg)
+            - total_revenue
+            - total_cogs
+            - order_count
+        """
+        date_range = format_date_range(date_from, date_to)
+        
+        # Use get_product_profitability_ranking which returns product-level aggregated data
+        try:
+            result = await self.call_tool(
+                "get_product_profitability_ranking",
+                {"date_range": date_range, "limit": 1000}  # Get all products
+            )
+            
+            # Transform the response to match expected format
+            items = []
+            if "top_performers" in result:
+                items.extend(result["top_performers"])
+            if "bottom_performers" in result:
+                items.extend(result["bottom_performers"])
+            
+            return {
+                "items": items,
+                "period": result.get("period", date_range),
+                "summary": result.get("summary", {})
+            }
+        except Exception as e:
+            logger.warning(f"get_product_profitability_ranking tool not available: {e}")
+            # Return empty structure - we'll handle this in the calling code
+            return {
+                "items": [],
+                "error": f"Product-level sales data not available from MCP endpoint: {str(e)}"
+            }
+    
     async def close(self):
         """Close the HTTP client session."""
         await self.session.aclose()

@@ -24,6 +24,7 @@ import { SglRetentionTab } from './components/SGL/SglRetentionTab';
 import { BenchmarkMap } from './components/SGL/BenchmarkMap';
 import { B2BFinancialPage } from './components/B2B/B2BFinancialPage';
 import { B2BCustomerPage } from './components/B2B/B2BCustomerPage';
+import { B2BProductPage } from './components/B2B/B2BProductPage';
 
 // Fix for default markers in react-leaflet
 delete (Icon.Default.prototype as any)._getIconUrl;
@@ -782,6 +783,8 @@ function App() {
         return <B2BFinancialPage />;
       case 'b2b-customer':
         return <B2BCustomerPage />;
+      case 'b2b-products':
+        return <B2BProductPage />;
     }
   };
 
@@ -796,7 +799,8 @@ function App() {
       playground: 'Playground',
       benchmark: 'Benchmark Locations',
       'b2b-financial': 'B2B Financial Analytics',
-      'b2b-customer': 'B2B Customer Analytics'
+      'b2b-customer': 'B2B Customer Analytics',
+      'b2b-products': 'B2B Product Analytics'
     };
     return titles[section];
   };

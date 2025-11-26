@@ -164,10 +164,17 @@ export const B2BFinancialPage: React.FC = () => {
       {/* Profit Margin Analysis */}
       {profitMargin && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <TrendingUp className="mr-2" size={20} />
-            Profit Margin Analysis (CM1, CM2, CM3)
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold flex items-center">
+              <TrendingUp className="mr-2" size={20} />
+              Profit Margin Analysis (CM1, CM2, CM3)
+            </h3>
+            {(profitMargin as any)?.purchase_price_metadata?.cogs_recalculated && (
+              <div className="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded">
+                <span className="font-semibold">✓ Purchase Prices Integrated:</span> CM1 recalculated using actual purchase prices from Google Sheets with next-day offset (today's purchase price applies to tomorrow's sales)
+              </div>
+            )}
+          </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="p-4 bg-blue-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">CM1 (Contribution Margin 1)</p>

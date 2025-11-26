@@ -2222,47 +2222,60 @@ async def get_b2b_product_profit_analysis(
             "days_with_data": set()
         })
         
-        # Process each item
+        # Process each item (from get_product_profitability_ranking - aggregated data)
         for item in product_sales["items"]:
             product_name = item.get("product_name") or item.get("product_id", "")
-            sale_date_str = item.get("sale_date") or item.get("order_date") or item.get("date")
-            quantity_kg = float(item.get("quantity_kg") or item.get("quantity") or item.get("weight_kg") or 0.0)
-            revenue = float(item.get("revenue") or item.get("subtotal") or item.get("price") or 0.0)
-            order_id = item.get("order_id") or item.get("id")
-            
-            if not product_name or quantity_kg <= 0:
+            if not product_name:
                 continue
             
-            # Parse sale date
+            # Get aggregated values from MCP response
+            total_revenue = float(item.get("total_revenue", 0.0))
+            total_quantity_sold = float(item.get("total_quantity_sold", 0.0))  # In units, may need conversion
+            order_count = int(item.get("order_count", 0))
+            mcp_cogs = float(item.get("total_cogs", 0.0))
+            mcp_warehouse = float(item.get("total_warehouse_cost", 0.0))
+            mcp_delivery = float(item.get("total_delivery_cost", 0.0))
+            
+            # Parse date range to calculate average purchase price
             try:
-                if isinstance(sale_date_str, str):
-                    sale_date = dt.strptime(sale_date_str.split("T")[0], "%Y-%m-%d").date()
-                else:
-                    sale_date = sale_date_str
+                from_date = dt.strptime(date_range["from"], "%Y-%m-%d").date()
+                to_date = dt.strptime(date_range["to"], "%Y-%m-%d").date()
+                # Use middle date of range for purchase price lookup (approximation)
+                middle_date = from_date + timedelta(days=(to_date - from_date).days // 2)
             except:
-                continue
+                middle_date = date.today()
             
-            # Get purchase price for this sale date (with next-day offset)
+            # Get purchase price for middle of date range (with next-day offset)
             purchase_price, source = purchase_price_service.get_purchase_price_for_sale_date(
-                product_name, sale_date
+                product_name, middle_date
             )
             
-            # Aggregate data
-            prod = product_data[product_name]
-            prod["product_name"] = product_name
-            prod["total_revenue"] += revenue
-            prod["total_quantity_kg"] += quantity_kg
-            if order_id:
-                prod["order_ids"].add(str(order_id))  # Track unique order IDs
-            prod["total_cogs"] += purchase_price * quantity_kg
-            prod["purchase_price_sources"][source] += 1
-            prod["days_with_data"].add(sale_date)
+            # Use purchase price to recalculate COGS if available, otherwise use MCP's COGS
+            if purchase_price > 0 and total_quantity_sold > 0:
+                # Assume total_quantity_sold is in kg (or convert if needed)
+                # For now, treating it as kg since MCP calculates costs per kg
+                recalculated_cogs = purchase_price * total_quantity_sold
+                actual_cogs = recalculated_cogs
+            else:
+                # Fallback to MCP's COGS calculation
+                actual_cogs = mcp_cogs
+                purchase_price = (mcp_cogs / total_quantity_sold) if total_quantity_sold > 0 else 0.0
+                source = "mcp_fallback"
             
-            # Calculate warehouse and delivery costs (3 birr/kg and 2 birr/kg)
-            warehouse_cost = quantity_kg * 3.0
-            delivery_cost = quantity_kg * 2.0
-            prod["warehouse_costs"] += warehouse_cost
-            prod["delivery_costs"] += delivery_cost
+            # Store product data
+            product_data[product_name] = {
+                "product_name": product_name,
+                "total_revenue": total_revenue,
+                "total_quantity_kg": total_quantity_sold,  # Assuming it's in kg
+                "order_ids": set(),  # We don't have individual order IDs from aggregated data
+                "total_cogs": actual_cogs,
+                "warehouse_costs": mcp_warehouse,
+                "delivery_costs": mcp_delivery,
+                "purchase_price_sources": {source: 1},
+                "days_with_data": set(),  # We don't have individual dates from aggregated data
+                "order_count": order_count,
+                "purchase_price_used": purchase_price
+            }
         
         # Convert to list and calculate final metrics
         products_list = []
@@ -2286,15 +2299,15 @@ async def get_b2b_product_profit_analysis(
                 "product_name": product_name,
                 "total_revenue": round(revenue, 2),
                 "total_quantity_kg": round(data["total_quantity_kg"], 2),
-                "total_orders": len(data["order_ids"]),
-                "purchase_price_used": round(avg_purchase_price, 2),
+                "total_orders": data.get("order_count", len(data["order_ids"])),
+                "purchase_price_used": round(data.get("purchase_price_used", avg_purchase_price), 2),
                 "total_cogs": round(cogs, 2),
                 "warehouse_costs": round(warehouse, 2),
                 "delivery_costs": round(delivery, 2),
                 "total_profit": round(profit, 2),
                 "profit_margin_percent": round(margin, 2),
                 "profit_per_kg": round(profit_per_kg, 2),
-                "days_with_data": len(data["days_with_data"])
+                "days_with_data": len(data["days_with_data"]) if data["days_with_data"] else 1  # Default to 1 for aggregated data
             })
             
             total_revenue += revenue

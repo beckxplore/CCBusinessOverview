@@ -500,3 +500,28 @@ export interface B2BPaymentBehavior {
   };
   date_range?: B2BDateRange;
 }
+
+export interface B2BProductProfitAnalysis {
+  products: Array<{
+    product_name: string;
+    total_revenue: number;
+    total_quantity_kg: number;
+    total_orders: number;
+    purchase_price_used: number;
+    total_cogs: number;
+    warehouse_costs: number;
+    delivery_costs: number;
+    total_profit: number;
+    profit_margin_percent: number;
+    profit_per_kg: number;
+    days_with_data: number;
+  }>;
+  summary: {
+    total_products: number;
+    total_revenue: number;
+    total_profit: number;
+    avg_profit_margin: number;
+  };
+  period: B2BDateRange;
+  error?: string;
+}

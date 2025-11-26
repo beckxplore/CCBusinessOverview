@@ -23,6 +23,7 @@ import type {
   B2BCustomerProfitability,
   B2BCreditRiskDashboard,
   B2BPaymentBehavior,
+  B2BProductProfitAnalysis,
 } from '../types';
 
 function resolveApiBaseUrl(): string {
@@ -233,6 +234,19 @@ export class ApiClient {
     const query = params.toString();
     return await this.fetchWithErrorHandling<B2BPaymentBehavior>(
       `${API_BASE_URL}/b2b/payment-behavior${query ? `?${query}` : ''}`
+    );
+  }
+
+  static async getB2BProductProfitAnalysis(
+    dateFrom?: string,
+    dateTo?: string
+  ): Promise<B2BProductProfitAnalysis> {
+    const params = new URLSearchParams();
+    if (dateFrom) params.append('date_from', dateFrom);
+    if (dateTo) params.append('date_to', dateTo);
+    const query = params.toString();
+    return await this.fetchWithErrorHandling<B2BProductProfitAnalysis>(
+      `${API_BASE_URL}/b2b/product-profit-analysis${query ? `?${query}` : ''}`
     );
   }
 }

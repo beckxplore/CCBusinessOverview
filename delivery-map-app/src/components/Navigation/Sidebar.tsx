@@ -10,7 +10,8 @@ import {
   Users,
   Landmark,
   Building2,
-  CreditCard
+  CreditCard,
+  Package
 } from 'lucide-react';
 
 export type NavigationSection = 
@@ -23,7 +24,8 @@ export type NavigationSection =
   | 'playground'
   | 'benchmark'
   | 'b2b-financial'
-  | 'b2b-customer';
+  | 'b2b-customer'
+  | 'b2b-products';
 
 interface SidebarProps {
   activeSection: NavigationSection;
@@ -128,6 +130,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange
           active={activeSection === 'b2b-customer'}
           onClick={() => onSectionChange('b2b-customer')}
           tooltip="B2B customer analytics including customer profitability (CLTV), credit risk dashboard, payment behavior, and DSO metrics."
+        />
+        <NavigationItem
+          icon={<Package size={20} />}
+          label="B2B Products"
+          section="b2b-products"
+          active={activeSection === 'b2b-products'}
+          onClick={() => onSectionChange('b2b-products')}
+          tooltip="B2B per-product profit and volume analysis with purchase price integration."
         />
       </nav>
 
