@@ -106,11 +106,12 @@ default_origins = [
 # Combine default and environment origins, filter out empty strings
 cors_origins = [origin.strip() for origin in default_origins + ALLOWED_ORIGINS if origin.strip()]
 
-# Add CORS middleware
+# Add CORS middleware - allow all origins for now (can be restricted later)
+# Note: allow_credentials must be False when using allow_origins=["*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins for testing
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
