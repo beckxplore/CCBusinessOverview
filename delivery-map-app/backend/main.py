@@ -1514,12 +1514,30 @@ async def health_check():
 def get_delivery_data():
     """Fetch delivery data from ClickHouse."""
     client = get_clickhouse_client()
+    
+    # Get week window even if database is unavailable
+    week_start, week_end, week_start_dt, week_end_dt = _get_week_window_datetimes()
+    
+    # Override with sheet window if available to ensure consistency across all sources
+    sheet_result = fetch_sheet_metrics()
+    if sheet_result and sheet_result.get("window"):
+        week_start = sheet_result["window"]["start"]
+        week_end = sheet_result["window"]["end"]
+        week_start_dt = datetime.combine(week_start, datetime.min.time())
+        week_end_dt = datetime.combine(week_end + timedelta(days=1), datetime.min.time())
+    
     if not client:
         logger.warning("ClickHouse unavailable for delivery data")
-        return {"deliveries": [], "message": "Database unavailable"}
+        return {
+            "records": [],
+            "count": 0,
+            "window": {
+                "start": week_start.isoformat(),
+                "end": week_end.isoformat(),
+            },
+        }
     
     try:
-        week_start, week_end, week_start_dt, week_end_dt = _get_week_window_datetimes()
         
         # Override with sheet window if available to ensure consistency across all sources
         sheet_result = fetch_sheet_metrics()
@@ -1659,7 +1677,22 @@ def get_statistics():
     client = get_clickhouse_client()
     if not client:
         logger.warning("ClickHouse unavailable for statistics")
-        return {"total_orders": 0, "normal_group_orders": 0, "super_group_orders": 0, "unique_locations": 0}
+        return {
+            "totalRecords": 0,
+            "normalGroups": 0,
+            "superGroups": 0,
+            "totalOrders": 0,
+            "avgOrdersPerGroup": 0.0,
+            "maxOrders": 0,
+            "uniqueLocations": 0,
+            "avgMembersPerGroup": 0.0,
+            "geographicBounds": {
+                "minLat": 0.0,
+                "maxLat": 0.0,
+                "minLon": 0.0,
+                "maxLon": 0.0
+            }
+        }
     
     try:
         week_start, week_end, week_start_dt, week_end_dt = _get_week_window_datetimes()
