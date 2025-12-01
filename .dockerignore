@@ -1,0 +1,82 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# Frontend build (will be built in Docker)
+delivery-map-app/dist/
+delivery-map-app/.vite/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+backend_server.log
+
+# Test results
+test_results/
+final_test_results/
+
+# Documentation
+*.md
+!README.md
+
+# Deployment files
+DEPLOYMENT.md
+vercel.json
+render.yaml
+Procfile
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Google service account (should be in env var)
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+
+# Data files (will be copied separately if needed)
+# data_points/ is included in Dockerfile
+

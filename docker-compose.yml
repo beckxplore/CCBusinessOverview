@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  delivery-map-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: delivery-map-analytics
+    ports:
+      - "8000:8000"
+    environment:
+      # ClickHouse Database Configuration
+      - CLICKHOUSE_HOST=${CLICKHOUSE_HOST:-64.227.129.135}
+      - CLICKHOUSE_PORT_STR=${CLICKHOUSE_PORT_STR:-8123}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-chipchip}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - CLICKHOUSE_DATABASE=${CLICKHOUSE_DATABASE:-chipchip}
+      - CLICKHOUSE_SECURE_STR=${CLICKHOUSE_SECURE_STR:-false}
+      - CLICKHOUSE_VERIFY_STR=${CLICKHOUSE_VERIFY_STR:-false}
+      
+      # Google Sheets Configuration
+      - GOOGLE_SERVICE_ACCOUNT_JSON=${GOOGLE_SERVICE_ACCOUNT_JSON:-}
+      - GOOGLE_SERVICE_ACCOUNT_FILE=${GOOGLE_SERVICE_ACCOUNT_FILE:-}
+      - GOOGLE_SHEETS_CACHE_TTL=${GOOGLE_SHEETS_CACHE_TTL:-600}
+      - GSHEET_PROCUREMENT_ID=${GSHEET_PROCUREMENT_ID:-}
+      - GSHEET_PROCUREMENT_WORKSHEET=${GSHEET_PROCUREMENT_WORKSHEET:-ProcurementCosts}
+      - GSHEET_LOCAL_PRICE_ID=${GSHEET_LOCAL_PRICE_ID:-}
+      - GSHEET_LOCAL_PRICE_WORKSHEET=${GSHEET_LOCAL_PRICE_WORKSHEET:-LocalShopPrices}
+      - GSHEET_OPERATIONAL_COST_ID=${GSHEET_OPERATIONAL_COST_ID:-}
+      - GSHEET_OPERATIONAL_COST_WORKSHEET=${GSHEET_OPERATIONAL_COST_WORKSHEET:-OperationalCosts}
+      
+      # Benchmark API Configuration
+      - BENCHMARK_API_URL=${BENCHMARK_API_URL:-}
+      - BENCHMARK_API_KEY=${BENCHMARK_API_KEY:-}
+      
+      # CORS Configuration
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-}
+      
+      # Python Configuration
+      - PYTHONUNBUFFERED=1
+      - PORT=8000
+    volumes:
+      # Mount data_points directory for CSV files (optional, for local development)
+      - ./data_points:/app/data_points:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+

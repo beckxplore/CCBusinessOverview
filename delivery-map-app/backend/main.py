@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import clickhouse_connect
 import os
@@ -115,6 +117,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Frontend static files directory (for Docker deployment)
+FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
 
 def get_clickhouse_client():
     """Create a new ClickHouse client instance. Returns None if connection fails."""
@@ -1479,7 +1484,9 @@ def load_product_metrics_data(return_window: bool = False) -> Union[List[Dict[st
 
 @app.get("/")
 async def root():
-    """Health check endpoint."""
+    """Serve frontend index.html or return API message if frontend not available."""
+    if FRONTEND_DIST.exists() and (FRONTEND_DIST / "index.html").exists():
+        return FileResponse(FRONTEND_DIST / "index.html")
     return {"message": "Delivery Map Analytics API is running", "status": "healthy"}
 
 @app.get("/api/health")
@@ -3189,6 +3196,32 @@ async def get_b2b_payment_behavior(
         "note": "This feature requires additional customer payment data that is not provided by the current MCP.",
         "period": format_date_range(date_from, date_to)
     }
+
+# Serve static files from frontend build directory (for Docker deployment)
+# This must be added after all API routes
+if FRONTEND_DIST.exists():
+    # Serve static assets (JS, CSS, images, etc.)
+    if (FRONTEND_DIST / "assets").exists():
+        app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST / "assets")), name="assets")
+    
+    # Serve other static files (favicon, etc.) and handle SPA routing
+    @app.get("/{path:path}")
+    async def serve_frontend(path: str):
+        """Serve frontend files, with fallback to index.html for SPA routing."""
+        # Skip API routes (should already be handled by FastAPI, but just in case)
+        if path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="API endpoint not found")
+        
+        # Try to serve the requested file
+        file_path = FRONTEND_DIST / path
+        if file_path.exists() and file_path.is_file():
+            return FileResponse(file_path)
+        
+        # For SPA routing, return index.html for all non-API routes
+        if (FRONTEND_DIST / "index.html").exists():
+            return FileResponse(FRONTEND_DIST / "index.html")
+        
+        raise HTTPException(status_code=404, detail="Not found")
 
 
 if __name__ == "__main__":
