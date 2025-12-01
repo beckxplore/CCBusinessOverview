@@ -173,6 +173,9 @@ LOCAL_PRICE_SHEET_WORKSHEET = os.getenv("GSHEET_LOCAL_PRICE_WORKSHEET", "LocalSh
 OPERATIONAL_COST_SHEET_ID = os.getenv("GSHEET_OPERATIONAL_COST_ID")
 OPERATIONAL_COST_SHEET_WORKSHEET = os.getenv("GSHEET_OPERATIONAL_COST_WORKSHEET", "OperationalCosts")
 
+DAILY_OPERATIONAL_COST_SHEET_ID = os.getenv("GSHEET_DAILY_OPERATIONAL_COST_ID")
+DAILY_OPERATIONAL_COST_SHEET_WORKSHEET = os.getenv("GSHEET_DAILY_OPERATIONAL_COST_WORKSHEET", "Daily CP 1 & 2")
+
 PRODUCT_METRICS_LOOKBACK_DAYS = int(os.getenv("PRODUCT_METRICS_LOOKBACK_DAYS", "30"))
 
 BENCHMARK_API_URL = os.getenv("BENCHMARK_API_URL")
@@ -1067,6 +1070,187 @@ def load_operational_costs_data() -> list[dict[str, Any]]:
         raise HTTPException(status_code=500, detail=f"Failed to load operational costs: {exc}") from exc
 
     return costs
+
+
+def load_daily_operational_costs_data() -> list[dict[str, Any]]:
+    """Load daily operational costs from Google Sheet with date columns.
+    
+    Expected sheet structure:
+    - Row 1: Headers (Day, Responsible, Data Source, Link, then date columns)
+    - Rows with cost categories: "Warehouse costs per Kg", "Fulfilment costs per Kg", "Last Mile Costs per Kg"
+    - Date columns contain daily cost values per kg
+    
+    Uses raw values instead of records to handle duplicate column headers.
+    """
+    from datetime import datetime
+    
+    if not GOOGLE_SHEETS_ENABLED or not DAILY_OPERATIONAL_COST_SHEET_ID:
+        logger.warning("Daily operational costs sheet not configured")
+        return []
+    
+    try:
+        client = GoogleSheetsClient.get_instance()
+        spreadsheet = client._client.open_by_key(DAILY_OPERATIONAL_COST_SHEET_ID)
+        ws = spreadsheet.worksheet(DAILY_OPERATIONAL_COST_SHEET_WORKSHEET)
+        
+        # Get all values as raw data (handles duplicate headers)
+        all_values = ws.get_all_values()
+        if not all_values or len(all_values) < 2:
+            logger.warning("Daily operational costs sheet is empty or has no data rows")
+            return []
+        
+        # First row is headers
+        headers = [str(h).strip() for h in all_values[0]]
+        
+        # Find date columns (skip first few columns: Day, Responsible, Data Source, Link)
+        date_column_indices: list[tuple[int, date]] = []
+        for idx, header in enumerate(headers):
+            # Skip known non-date columns
+            header_lower = header.lower()
+            if header_lower in ["day", "responsible", "data source", "link", "data source (system,manual , asumption , average)"]:
+                continue
+            
+            # Try to parse as date
+            try:
+                date_str = header.strip()
+                if not date_str:
+                    continue
+                
+                # Try common date formats with 4-digit years first
+                parsed_date = None
+                for fmt in ["%m/%d/%Y", "%m-%d-%Y", "%Y-%m-%d", "%d/%m/%Y"]:
+                    try:
+                        parsed_date = datetime.strptime(date_str, fmt).date()
+                        break
+                    except ValueError:
+                        continue
+                
+                # Try 2-digit year formats - handle intelligently
+                if not parsed_date:
+                    for fmt in ["%m/%d/%y", "%d/%m/%y", "%m-%d-%y"]:
+                        try:
+                            temp_date = datetime.strptime(date_str, fmt)
+                            year = temp_date.year
+                            
+                            # Python's %y: 00-68 -> 2000-2068, 69-99 -> 1969-1999
+                            # For operational costs in 2025, we want dates in 2020s
+                            # If parsed year is before 2020, assume it should be in 2000s
+                            if year < 2020:
+                                # Extract the last 2 digits and assume 2000s
+                                last_two_digits = year % 100
+                                # If last_two_digits is 0-30, it's likely 2000-2030
+                                # If it's 31-99, it was parsed as 1931-1999, but should be 2031-2099
+                                # For now, assume all should be 2000s (20xx)
+                                year = 2000 + last_two_digits
+                            
+                            parsed_date = temp_date.replace(year=year).date()
+                            break
+                        except (ValueError, TypeError):
+                            continue
+                
+                if parsed_date:
+                    # Validate date is reasonable (between 2020 and 2030 for operational costs)
+                    if 2020 <= parsed_date.year <= 2030:
+                        date_column_indices.append((idx, parsed_date))
+                    else:
+                        logger.debug(f"Skipping date {parsed_date} (year {parsed_date.year} outside expected range)")
+            except Exception:
+                continue
+        
+        # Sort date columns by date
+        date_column_indices.sort(key=lambda x: x[1])
+        
+        # Find the cost category rows we're looking for
+        cost_categories = {
+            "warehouse": ["warehouse costs per kg", "warehouse cost per kg", "warehouse costs"],
+            "fulfilment": ["fulfilment costs per kg", "fulfillment costs per kg", "fulfilment cost per kg", "fulfillment cost per kg", "fulfilment costs"],
+            "last_mile": ["last mile costs per kg", "last mile cost per kg", "last mile costs", "last-mile costs per kg"]
+        }
+        
+        # Find "Day" column index
+        day_col_idx = None
+        for idx, header in enumerate(headers):
+            if header.lower().strip() == "day":
+                day_col_idx = idx
+                break
+        
+        if day_col_idx is None:
+            logger.warning("Could not find 'Day' column in daily operational costs sheet")
+            return []
+        
+        # Known row numbers for cost categories (sheet row numbers, 1-indexed)
+        # Row 51: Warehouse costs per Kg
+        # Row 58: Fulfilment costs per Kg
+        # Row 71: Last Mile costs per Kg
+        # Convert to 0-indexed for all_values array (row 1 = index 0, row 51 = index 50)
+        known_cost_rows = {
+            50: "warehouse",  # Row 51 in sheet (0-indexed: 50)
+            57: "fulfilment",  # Row 58 in sheet (0-indexed: 57)
+            70: "last_mile",   # Row 71 in sheet (0-indexed: 70)
+        }
+        
+        # Process data rows
+        daily_costs: list[dict[str, Any]] = []
+        
+        # Process all rows starting from row 2 (index 1 in all_values)
+        for row_index_in_array, row in enumerate(all_values[1:], start=1):  # Start from index 1 (row 2 in sheet)
+            # row_index_in_array is the index in all_values (0-indexed, starting from 1 for row 2)
+            # Actual sheet row number = row_index_in_array + 1
+            
+            if len(row) <= day_col_idx:
+                continue
+            
+            day_value = str(row[day_col_idx]).strip().lower()
+            if not day_value:
+                continue
+            
+            # Check if this is a known cost category row by row number
+            category_type = None
+            category_name = None
+            
+            # Check if this row index matches one of the known cost category rows
+            if row_index_in_array in known_cost_rows:
+                category_type = known_cost_rows[row_index_in_array]
+                category_name = day_value.title()
+                logger.debug(f"Found {category_type} costs at row {row_index_in_array + 1} (index {row_index_in_array})")
+            else:
+                # Fallback: Check if this row matches any cost category by keywords
+                for cat_type, keywords in cost_categories.items():
+                    if any(keyword in day_value for keyword in keywords):
+                        category_type = cat_type
+                        category_name = day_value.title()
+                        logger.debug(f"Found {category_type} costs by keyword matching at row {row_index_in_array + 1}")
+                        break
+            
+            if not category_type:
+                continue
+            
+            # Extract cost values for each date column
+            for col_idx, date_obj in date_column_indices:
+                if col_idx < len(row):
+                    cost_value = _parse_float(row[col_idx])
+                    if cost_value > 0:  # Only include non-zero costs
+                        daily_costs.append({
+                            "date": date_obj.isoformat(),
+                            "category": category_type,
+                            "category_name": category_name,
+                            "cost_per_kg": cost_value
+                        })
+        
+        # Sort by date, then by category
+        daily_costs.sort(key=lambda x: (x["date"], x["category"]))
+        
+        logger.info(f"Loaded {len(daily_costs)} daily operational cost records")
+        return daily_costs
+        
+    except GoogleSheetsNotConfigured:
+        logger.warning("Google Sheets not configured for daily operational costs")
+        return []
+    except Exception as exc:
+        logger.error(f"Failed to load daily operational costs: {exc}")
+        import traceback
+        logger.debug(traceback.format_exc())
+        return []
 
 
 def load_product_metrics_data(return_window: bool = False) -> Union[List[Dict[str, Any]], Tuple[List[Dict[str, Any]], Optional[Dict[str, Any]]]]:
@@ -2004,6 +2188,270 @@ def get_operational_costs():
     costs = load_operational_costs_data()
     return {"costs": costs}
 
+@app.get("/api/costs/daily-operational")
+def get_daily_operational_costs(
+    date_from: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
+    date_to: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
+):
+    """Return daily operational costs (Warehouse, Fulfilment, Last Mile) per kg from Google Sheet.
+    
+    Returns costs grouped by date and category. Optionally filter by date range.
+    """
+    from datetime import datetime
+    
+    daily_costs = load_daily_operational_costs_data()
+    
+    # Filter by date range if provided
+    if date_from or date_to:
+        filtered_costs = []
+        for cost in daily_costs:
+            cost_date = datetime.fromisoformat(cost["date"]).date()
+            
+            if date_from:
+                from_date = datetime.fromisoformat(date_from).date()
+                if cost_date < from_date:
+                    continue
+            
+            if date_to:
+                to_date = datetime.fromisoformat(date_to).date()
+                if cost_date > to_date:
+                    continue
+            
+            filtered_costs.append(cost)
+        
+        daily_costs = filtered_costs
+    
+    # Group by date for easier frontend consumption
+    costs_by_date: dict[str, dict[str, Any]] = {}
+    for cost in daily_costs:
+        date_key = cost["date"]
+        if date_key not in costs_by_date:
+            costs_by_date[date_key] = {
+                "date": date_key,
+                "warehouse_cost_per_kg": None,
+                "fulfilment_cost_per_kg": None,
+                "last_mile_cost_per_kg": None
+            }
+        
+        category = cost["category"]
+        if category == "warehouse":
+            costs_by_date[date_key]["warehouse_cost_per_kg"] = cost["cost_per_kg"]
+        elif category == "fulfilment":
+            costs_by_date[date_key]["fulfilment_cost_per_kg"] = cost["cost_per_kg"]
+        elif category == "last_mile":
+            costs_by_date[date_key]["last_mile_cost_per_kg"] = cost["cost_per_kg"]
+    
+    # Convert to list sorted by date
+    result = sorted(costs_by_date.values(), key=lambda x: x["date"])
+    
+    return {
+        "daily_costs": result,
+        "count": len(result),
+        "date_range": {
+            "from": result[0]["date"] if result else None,
+            "to": result[-1]["date"] if result else None
+        } if result else None
+    }
+
+@app.get("/api/margins/daily-real")
+def get_daily_real_margins(
+    date_from: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
+    date_to: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
+):
+    """Calculate real margins by matching daily operational costs with daily volumes.
+    
+    Only includes data from 10/13/2025 onwards as specified.
+    Returns daily margins with operational costs applied to volumes.
+    """
+    from datetime import datetime, date as date_type
+    import pandas as pd
+    
+    # Minimum date: 10/13/2025
+    MIN_DATE = date_type(2025, 10, 13)
+    
+    # Get daily operational costs
+    daily_costs_raw = load_daily_operational_costs_data()
+    
+    # Get daily volumes from Google Sheet
+    df = fetch_raw_sheet_data()
+    if df is None or df.empty:
+        return {
+            "daily_margins": [],
+            "count": 0,
+            "error": "No volume data available"
+        }
+    
+    # Filter by date range and minimum date
+    if 'date_dt' in df.columns:
+        df['date'] = df['date_dt'].dt.date
+        if date_from:
+            from_date = datetime.fromisoformat(date_from).date()
+            df = df[df['date'] >= from_date]
+        else:
+            df = df[df['date'] >= MIN_DATE]
+        
+        if date_to:
+            to_date = datetime.fromisoformat(date_to).date()
+            df = df[df['date'] <= to_date]
+    else:
+        return {
+            "daily_margins": [],
+            "count": 0,
+            "error": "Date column not found in volume data"
+        }
+    
+    # Group volumes by date
+    daily_volumes = df.groupby('date').agg({
+        'final_volume_kg': 'sum',
+        'final_revenue': 'sum',
+        'final_cost': 'sum'
+    }).reset_index()
+    
+    # Group operational costs by date
+    costs_by_date: dict[str, dict[str, float]] = {}
+    for cost in daily_costs_raw:
+        cost_date_str = cost["date"]
+        cost_date = datetime.fromisoformat(cost_date_str).date()
+        
+        # Only include dates from 10/13/2025 onwards
+        if cost_date < MIN_DATE:
+            continue
+        
+        if cost_date_str not in costs_by_date:
+            costs_by_date[cost_date_str] = {
+                "warehouse": 0.0,
+                "fulfilment": 0.0,
+                "last_mile": 0.0
+            }
+        
+        category = cost["category"]
+        if category in costs_by_date[cost_date_str]:
+            costs_by_date[cost_date_str][category] = cost["cost_per_kg"]
+    
+    # Calculate margins for each day
+    daily_margins = []
+    for _, row in daily_volumes.iterrows():
+        day_date = row['date']
+        day_date_str = day_date.isoformat() if isinstance(day_date, date_type) else str(day_date)
+        
+        volume_kg = float(row['final_volume_kg'])
+        revenue = float(row['final_revenue'])
+        procurement_cost = float(row['final_cost'])
+        
+        # Get operational costs for this day
+        day_costs = costs_by_date.get(day_date_str, {
+            "warehouse": 0.0,
+            "fulfilment": 0.0,
+            "last_mile": 0.0
+        })
+        
+        # Calculate total operational cost
+        total_ops_cost_per_kg = (
+            day_costs["warehouse"] + 
+            day_costs["fulfilment"] + 
+            day_costs["last_mile"]
+        )
+        
+        total_ops_cost = total_ops_cost_per_kg * volume_kg if volume_kg > 0 else 0.0
+        
+        # Calculate real margin
+        total_cost = procurement_cost + total_ops_cost
+        margin = revenue - total_cost
+        margin_pct = (margin / revenue * 100) if revenue > 0 else 0.0
+        
+        daily_margins.append({
+            "date": day_date_str,
+            "volume_kg": volume_kg,
+            "revenue_etb": revenue,
+            "procurement_cost_etb": procurement_cost,
+            "warehouse_cost_etb": day_costs["warehouse"] * volume_kg if volume_kg > 0 else 0.0,
+            "fulfilment_cost_etb": day_costs["fulfilment"] * volume_kg if volume_kg > 0 else 0.0,
+            "last_mile_cost_etb": day_costs["last_mile"] * volume_kg if volume_kg > 0 else 0.0,
+            "total_operational_cost_etb": total_ops_cost,
+            "warehouse_cost_per_kg": day_costs["warehouse"],
+            "fulfilment_cost_per_kg": day_costs["fulfilment"],
+            "last_mile_cost_per_kg": day_costs["last_mile"],
+            "total_operational_cost_per_kg": total_ops_cost_per_kg,
+            "total_cost_etb": total_cost,
+            "margin_etb": margin,
+            "margin_pct": margin_pct
+        })
+    
+    # Sort by date
+    daily_margins.sort(key=lambda x: x["date"])
+    
+    return {
+        "daily_margins": daily_margins,
+        "count": len(daily_margins),
+        "date_range": {
+            "from": daily_margins[0]["date"] if daily_margins else None,
+            "to": daily_margins[-1]["date"] if daily_margins else None
+        } if daily_margins else None
+    }
+
+@app.get("/api/costs/operational/latest")
+def get_latest_operational_costs():
+    """Get the latest operational costs for use in playground.
+    
+    Returns the most recent values for warehouse, fulfilment, and last mile costs per kg.
+    """
+    from datetime import datetime
+    
+    daily_costs = load_daily_operational_costs_data()
+    
+    if not daily_costs:
+        # Fallback to static operational costs
+        static_costs = load_operational_costs_data()
+        warehouse = 0.0
+        fulfilment = 0.0
+        last_mile = 0.0
+        
+        for cost in static_costs:
+            cat = cost.get("cost_category", "").lower()
+            if "warehouse" in cat:
+                warehouse = cost.get("cost_per_kg", 0.0)
+            elif "fulfilment" in cat:
+                fulfilment = cost.get("cost_per_kg", 0.0)
+            elif "last" in cat and "mile" in cat:
+                last_mile = cost.get("cost_per_kg", 0.0)
+        
+        return {
+            "warehouse_cost_per_kg": warehouse,
+            "fulfilment_cost_per_kg": fulfilment,
+            "last_mile_cost_per_kg": last_mile,
+            "total_cost_per_kg": warehouse + fulfilment + last_mile,
+            "source": "static",
+            "date": None
+        }
+    
+    # Find the latest date
+    latest_date = max(datetime.fromisoformat(cost["date"]).date() for cost in daily_costs)
+    latest_date_str = latest_date.isoformat()
+    
+    # Get costs for the latest date
+    latest_costs = {
+        "warehouse": 0.0,
+        "fulfilment": 0.0,
+        "last_mile": 0.0
+    }
+    
+    for cost in daily_costs:
+        if cost["date"] == latest_date_str:
+            category = cost["category"]
+            if category in latest_costs:
+                latest_costs[category] = cost["cost_per_kg"]
+    
+    total = latest_costs["warehouse"] + latest_costs["fulfilment"] + latest_costs["last_mile"]
+    
+    return {
+        "warehouse_cost_per_kg": latest_costs["warehouse"],
+        "fulfilment_cost_per_kg": latest_costs["fulfilment"],
+        "last_mile_cost_per_kg": latest_costs["last_mile"],
+        "total_cost_per_kg": total,
+        "source": "daily",
+        "date": latest_date_str
+    }
+
 @app.get("/api/costs/tiers")
 def get_sgl_tiers():
     """Return SGL tier definitions from SGL_TIERS.csv."""
@@ -2037,12 +2485,100 @@ async def get_b2b_business_overview(
     date_from: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
     date_to: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
 ):
-    """Get B2B business overview: revenue, orders, profit summary."""
+    """Get B2B business overview: revenue, orders, profit summary. Calculated from daily product orders."""
     try:
+        from collections import defaultdict
+        from datetime import datetime as dt
+        
         client = get_b2b_mcp_client()
+        purchase_price_service = get_b2b_purchase_price_service()
         date_range = format_date_range(date_from, date_to)
-        result = await client.call_tool("get_business_overview", {"date_range": date_range})
-        return result
+        
+        # Get daily product orders data from Product Orders MCP
+        daily_sales = await client.get_daily_sales_data(date_from, date_to)
+        
+        if not daily_sales or "items" not in daily_sales or len(daily_sales.get("items", [])) == 0:
+            return {
+                "revenue": 0,
+                "orders": 0,
+                "profit": 0,
+                "profit_margin": 0,
+                "total_customers": 0,
+                "avg_order_value": 0,
+                "date_range": date_range,
+                "error": "No B2B data available for the specified date range"
+            }
+        
+        # Calculate totals from daily data (already correctly calculated per day)
+        total_revenue = 0.0
+        total_orders = 0
+        total_cogs = 0.0
+        total_warehouse = 0.0
+        total_delivery = 0.0
+        unique_customers = set()
+        
+        for item in daily_sales["items"]:
+            product_name = item.get("product_name")
+            order_date_str = item.get("order_date") or item.get("sale_date")
+            quantity_kg = float(item.get("quantity_kg") or item.get("quantity_sold") or 0.0)
+            revenue = float(item.get("total_revenue") or item.get("revenue") or 0.0)
+            order_count = int(item.get("number_of_orders") or item.get("order_count") or 0)
+            
+            # Include items with revenue > 0 even if quantity is 0 (some orders may have 0 quantity but still have revenue)
+            # Or include items with orders > 0 (to count orders even if quantity/revenue is 0)
+            if not product_name or (quantity_kg <= 0 and revenue <= 0 and order_count <= 0):
+                continue
+            
+            # Parse order date
+            try:
+                if isinstance(order_date_str, str):
+                    order_date = dt.strptime(order_date_str.split("T")[0], "%Y-%m-%d").date()
+                else:
+                    order_date = order_date_str
+            except:
+                continue
+            
+            # Get purchase price for this specific order date (with next-day offset)
+            purchase_price, _ = purchase_price_service.get_purchase_price_for_sale_date(
+                product_name, order_date
+            )
+            
+            # Calculate daily COGS = purchase_price × quantity
+            daily_cogs = purchase_price * quantity_kg if purchase_price > 0 else 0.0
+            daily_warehouse = quantity_kg * 3.0  # 3 birr/kg
+            daily_delivery = quantity_kg * 2.0   # 2 birr/kg
+            
+            # Sum totals
+            total_revenue += revenue
+            total_orders += order_count
+            total_cogs += daily_cogs
+            total_warehouse += daily_warehouse
+            total_delivery += daily_delivery
+            
+            # Track unique customers (if customer_type_id is available)
+            customer_type_id = item.get("customer_type_id")
+            if customer_type_id:
+                unique_customers.add(customer_type_id)
+        
+        # Calculate profit
+        total_profit = total_revenue - total_cogs - total_warehouse - total_delivery
+        profit_margin = (total_profit / total_revenue * 100) if total_revenue > 0 else 0.0
+        avg_order_value = (total_revenue / total_orders) if total_orders > 0 else 0.0
+        
+        return {
+            "revenue": round(total_revenue, 2),
+            "orders": total_orders,
+            "profit": round(total_profit, 2),
+            "profit_margin": round(profit_margin, 2),
+            "total_customers": len(unique_customers),
+            "avg_order_value": round(avg_order_value, 2),
+            "date_range": date_range,
+            "costs": {
+                "product_cogs": round(total_cogs, 2),
+                "warehouse": round(total_warehouse, 2),
+                "delivery": round(total_delivery, 2)
+            }
+        }
     except Exception as e:
         logger.error(f"Error fetching B2B business overview: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch B2B business overview: {str(e)}")
@@ -2061,29 +2597,49 @@ async def get_b2b_profit_margin_analysis(
         purchase_price_service = get_b2b_purchase_price_service()
         date_range = format_date_range(date_from, date_to)
         
-        # Get base profit margin analysis from MCP
-        result = await client.call_tool("get_profit_margin_analysis", {"date_range": date_range})
+        # Get daily product orders data (new MCP provides this directly)
+        daily_sales = await client.get_daily_sales_data(date_from, date_to)
         
-        # Try to get product-level sales data to recalculate with actual purchase prices
+        # Calculate profit margin analysis from daily data
+        if not daily_sales or "items" not in daily_sales or len(daily_sales.get("items", [])) == 0:
+            return {
+                "margin_breakdown": {
+                    "cm1_gross_profit": {"amount": 0, "percentage": "0%", "formula": "Revenue - Product COGS", "description": "Revenue minus direct product costs."},
+                    "cm2_after_warehouse": {"amount": 0, "percentage": "0%", "formula": "CM1 - Warehouse Costs", "description": "CM1 minus warehouse handling costs."},
+                    "cm3_net_profit": {"amount": 0, "percentage": "0%", "formula": "CM2 - Delivery Costs", "description": "CM2 minus last-mile delivery costs."},
+                },
+                "summary": {
+                    "total_revenue": 0,
+                    "product_cogs": 0,
+                    "warehouse_costs": 0,
+                    "delivery_costs": 0,
+                    "final_profit": 0,
+                    "final_margin": "0%",
+                },
+                "period": date_range,
+                "error": "No B2B data available for the specified date range"
+            }
+        
+        # Calculate from daily data (already fetched above)
         try:
-            product_sales = await client.get_product_level_sales(date_from, date_to)
+            use_daily_data = daily_sales and "items" in daily_sales and len(daily_sales.get("items", [])) > 0
             
-            # If we have product-level data, recalculate COGS with actual purchase prices
-            if product_sales and "items" in product_sales and len(product_sales["items"]) > 0:
+            if use_daily_data:
+                # Calculate on daily basis: for each day, calculate COGS = purchase_price × quantity, then sum
                 total_actual_cogs = 0.0
-                purchase_price_stats = {
-                    "exact_date": 0,
-                    "latest_before": 0,
-                    "average": 0,
-                    "missing": 0
-                }
+                total_actual_revenue = 0.0
+                purchase_price_stats = defaultdict(int)
                 
-                for item in product_sales["items"]:
+                for item in daily_sales["items"]:
                     product_name = item.get("product_name") or item.get("product_id", "")
-                    sale_date_str = item.get("sale_date") or item.get("order_date") or item.get("date")
-                    quantity_kg = float(item.get("quantity_kg") or item.get("quantity") or item.get("weight_kg") or 0.0)
+                    if not product_name:
+                        continue
                     
-                    if not product_name or not sale_date_str or quantity_kg <= 0:
+                    sale_date_str = item.get("sale_date") or item.get("order_date") or item.get("date")
+                    quantity_kg = float(item.get("quantity_sold") or item.get("quantity_kg") or item.get("quantity") or item.get("weight_kg") or 0.0)
+                    selling_price = float(item.get("selling_price") or item.get("price") or item.get("unit_price") or 0.0)
+                    
+                    if quantity_kg <= 0:
                         continue
                     
                     # Parse sale date
@@ -2095,69 +2651,123 @@ async def get_b2b_profit_margin_analysis(
                     except:
                         continue
                     
-                    # Get purchase price for this sale date (with next-day offset)
+                    # Calculate daily revenue - use total_revenue from MCP (already calculated correctly per day)
+                    daily_revenue = float(item.get("total_revenue") or item.get("revenue") or 0.0)
+                    # If revenue not provided, calculate from unit_price × quantity
+                    if daily_revenue <= 0 and selling_price > 0:
+                        daily_revenue = selling_price * quantity_kg
+                    total_actual_revenue += daily_revenue
+                    
+                    # Get purchase price for this specific sale date (with next-day offset)
                     purchase_price, source = purchase_price_service.get_purchase_price_for_sale_date(
                         product_name, sale_date
                     )
                     
+                    # Calculate daily COGS = purchase_price × quantity
                     if purchase_price > 0:
                         total_actual_cogs += purchase_price * quantity_kg
-                        purchase_price_stats[source] = purchase_price_stats.get(source, 0) + 1
+                        purchase_price_stats[source] += 1
                 
-                # Recalculate margins with actual COGS
-                if total_actual_cogs > 0 and "summary" in result:
-                    original_cogs = float(result["summary"].get("product_cogs", 0))
-                    if original_cogs > 0:
-                        # Update COGS in summary
-                        result["summary"]["product_cogs"] = total_actual_cogs
-                        result["summary"]["original_product_cogs"] = original_cogs
-                        
-                        # Recalculate CM1, CM2, CM3
-                        total_revenue = float(result["summary"].get("total_revenue", 0))
-                        warehouse_costs = float(result["summary"].get("warehouse_costs", 0))
-                        delivery_costs = float(result["summary"].get("delivery_costs", 0))
-                        
-                        # CM1 = Revenue - Actual COGS
-                        cm1_amount = total_revenue - total_actual_cogs
-                        cm1_percent = (cm1_amount / total_revenue * 100) if total_revenue > 0 else 0
-                        
-                        # CM2 = CM1 - Warehouse Costs
-                        cm2_amount = cm1_amount - warehouse_costs
-                        cm2_percent = (cm2_amount / total_revenue * 100) if total_revenue > 0 else 0
-                        
-                        # CM3 = CM2 - Delivery Costs
-                        cm3_amount = cm2_amount - delivery_costs
-                        cm3_percent = (cm3_amount / total_revenue * 100) if total_revenue > 0 else 0
-                        
-                        # Update margin breakdown
-                        if "margin_breakdown" in result:
-                            result["margin_breakdown"]["cm1_gross_profit"]["amount"] = cm1_amount
-                            result["margin_breakdown"]["cm1_gross_profit"]["percentage"] = f"{cm1_percent:.2f}%"
-                            
-                            result["margin_breakdown"]["cm2_after_warehouse"]["amount"] = cm2_amount
-                            result["margin_breakdown"]["cm2_after_warehouse"]["percentage"] = f"{cm2_percent:.2f}%"
-                            
-                            result["margin_breakdown"]["cm3_net_profit"]["amount"] = cm3_amount
-                            result["margin_breakdown"]["cm3_net_profit"]["percentage"] = f"{cm3_percent:.2f}%"
-                        
-                        # Update summary
-                        result["summary"]["final_profit"] = cm3_amount
-                        result["summary"]["final_margin"] = f"{cm3_percent:.2f}%"
-                        
-                        # Add metadata about purchase price source
-                        result["purchase_price_metadata"] = {
-                            "cogs_recalculated": True,
-                            "purchase_price_sources": purchase_price_stats,
-                            "note": "CM1 recalculated using actual purchase prices from Google Sheets with next-day offset"
-                        }
+                # Use daily-calculated revenue
+                total_revenue = total_actual_revenue
+                
+                # Calculate warehouse and delivery costs (3 birr/kg and 2 birr/kg)
+                total_warehouse_costs = 0.0
+                total_delivery_costs = 0.0
+                for item in daily_sales["items"]:
+                    quantity_kg = float(item.get("quantity_sold", 0.0) or item.get("quantity_kg", 0.0))
+                    if quantity_kg > 0:
+                        total_warehouse_costs += quantity_kg * 3.0
+                        total_delivery_costs += quantity_kg * 2.0
+                
+                # Calculate CM1, CM2, CM3
+                cm1_amount = total_revenue - total_actual_cogs
+                cm1_percent = (cm1_amount / total_revenue * 100) if total_revenue > 0 else 0
+                
+                cm2_amount = cm1_amount - total_warehouse_costs
+                cm2_percent = (cm2_amount / total_revenue * 100) if total_revenue > 0 else 0
+                
+                cm3_amount = cm2_amount - total_delivery_costs
+                cm3_percent = (cm3_amount / total_revenue * 100) if total_revenue > 0 else 0
+                
+                # Build result structure
+                result = {
+                    "margin_breakdown": {
+                        "cm1_gross_profit": {
+                            "amount": round(cm1_amount, 2),
+                            "percentage": f"{cm1_percent:.2f}%",
+                            "formula": "Revenue - Product COGS",
+                            "description": "Revenue minus direct product costs (purchase price)."
+                        },
+                        "cm2_after_warehouse": {
+                            "amount": round(cm2_amount, 2),
+                            "percentage": f"{cm2_percent:.2f}%",
+                            "formula": "CM1 - Warehouse Costs",
+                            "description": "CM1 minus warehouse handling costs."
+                        },
+                        "cm3_net_profit": {
+                            "amount": round(cm3_amount, 2),
+                            "percentage": f"{cm3_percent:.2f}%",
+                            "formula": "CM2 - Delivery Costs",
+                            "description": "CM2 minus last-mile delivery costs, representing final profit."
+                        },
+                    },
+                    "summary": {
+                        "total_revenue": round(total_revenue, 2),
+                        "product_cogs": round(total_actual_cogs, 2),
+                        "warehouse_costs": round(total_warehouse_costs, 2),
+                        "delivery_costs": round(total_delivery_costs, 2),
+                        "final_profit": round(cm3_amount, 2),
+                        "final_margin": f"{cm3_percent:.2f}%",
+                    },
+                    "period": date_range,
+                    "purchase_price_metadata": {
+                        "cogs_recalculated": True,
+                        "calculation_method": "daily_transactions",
+                        "purchase_price_sources": dict(purchase_price_stats),
+                        "note": "Calculated on daily basis: COGS = purchase_price × quantity per day, then summed. Revenue from daily product orders."
+                    }
+                }
+                
+                return result
+            else:
+                # No daily data available
+                return {
+                    "margin_breakdown": {
+                        "cm1_gross_profit": {"amount": 0, "percentage": "0%", "formula": "Revenue - Product COGS", "description": "Revenue minus direct product costs."},
+                        "cm2_after_warehouse": {"amount": 0, "percentage": "0%", "formula": "CM1 - Warehouse Costs", "description": "CM1 minus warehouse handling costs."},
+                        "cm3_net_profit": {"amount": 0, "percentage": "0%", "formula": "CM2 - Delivery Costs", "description": "CM2 minus last-mile delivery costs."},
+                    },
+                    "summary": {
+                        "total_revenue": 0,
+                        "product_cogs": 0,
+                        "warehouse_costs": 0,
+                        "delivery_costs": 0,
+                        "final_profit": 0,
+                        "final_margin": "0%",
+                    },
+                    "period": date_range,
+                    "error": "No B2B data available for the specified date range"
+                }
         except Exception as e:
-            logger.warning(f"Could not recalculate with purchase prices: {e}. Using MCP data as-is.")
-            result["purchase_price_metadata"] = {
-                "cogs_recalculated": False,
-                "note": "Purchase price recalculation not available. Using MCP-provided COGS."
+            logger.warning(f"Could not calculate profit margins: {e}")
+            return {
+                "margin_breakdown": {
+                    "cm1_gross_profit": {"amount": 0, "percentage": "0%", "formula": "Revenue - Product COGS", "description": "Revenue minus direct product costs."},
+                    "cm2_after_warehouse": {"amount": 0, "percentage": "0%", "formula": "CM1 - Warehouse Costs", "description": "CM1 minus warehouse handling costs."},
+                    "cm3_net_profit": {"amount": 0, "percentage": "0%", "formula": "CM2 - Delivery Costs", "description": "CM2 minus last-mile delivery costs."},
+                },
+                "summary": {
+                    "total_revenue": 0,
+                    "product_cogs": 0,
+                    "warehouse_costs": 0,
+                    "delivery_costs": 0,
+                    "final_profit": 0,
+                    "final_margin": "0%",
+                },
+                "period": date_range,
+                "error": f"Failed to calculate profit margins: {str(e)}"
             }
-        
-        return result
     except Exception as e:
         logger.error(f"Error fetching B2B profit margin analysis: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch B2B profit margin analysis: {str(e)}")
@@ -2168,12 +2778,87 @@ async def get_b2b_cost_structure_analysis(
     date_from: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
     date_to: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
 ):
-    """Get B2B cost structure analysis: COGS, warehouse, delivery costs."""
+    """Get B2B cost structure analysis: COGS, warehouse, delivery costs. Calculated from daily product orders."""
     try:
         client = get_b2b_mcp_client()
+        purchase_price_service = get_b2b_purchase_price_service()
         date_range = format_date_range(date_from, date_to)
-        result = await client.call_tool("get_cost_structure_analysis", {"date_range": date_range})
-        return result
+        
+        # Get daily product orders data
+        daily_sales = await client.get_daily_sales_data(date_from, date_to)
+        
+        if not daily_sales or "items" not in daily_sales or len(daily_sales.get("items", [])) == 0:
+            return {
+                "cogs": 0,
+                "warehouse_costs": 0,
+                "delivery_costs": 0,
+                "other_costs": 0,
+                "total_costs": 0,
+                "breakdown": [],
+                "date_range": date_range,
+                "error": "No B2B data available for the specified date range"
+            }
+        
+        # Calculate costs from daily data
+        total_cogs = 0.0
+        total_warehouse = 0.0
+        total_delivery = 0.0
+        
+        for item in daily_sales["items"]:
+            product_name = item.get("product_name", "")
+            order_date_str = item.get("order_date") or item.get("sale_date")
+            quantity_kg = float(item.get("quantity_sold", 0.0) or item.get("quantity_kg", 0.0))
+            
+            if quantity_kg <= 0:
+                continue
+            
+            # Parse order date for purchase price lookup
+            try:
+                if isinstance(order_date_str, str):
+                    order_date = datetime.strptime(order_date_str.split("T")[0], "%Y-%m-%d").date()
+                else:
+                    order_date = order_date_str
+            except:
+                continue
+            
+            # Get purchase price for this order date (with next-day offset)
+            purchase_price, _ = purchase_price_service.get_purchase_price_for_sale_date(
+                product_name, order_date
+            )
+            
+            # Calculate costs for this day
+            if purchase_price > 0:
+                total_cogs += purchase_price * quantity_kg
+            total_warehouse += quantity_kg * 3.0
+            total_delivery += quantity_kg * 2.0
+        
+        total_costs = total_cogs + total_warehouse + total_delivery
+        
+        return {
+            "cogs": round(total_cogs, 2),
+            "warehouse_costs": round(total_warehouse, 2),
+            "delivery_costs": round(total_delivery, 2),
+            "other_costs": 0,
+            "total_costs": round(total_costs, 2),
+            "breakdown": [
+                {
+                    "category": "Product COGS",
+                    "amount": round(total_cogs, 2),
+                    "percentage": round((total_cogs / total_costs * 100) if total_costs > 0 else 0, 2)
+                },
+                {
+                    "category": "Warehouse Costs",
+                    "amount": round(total_warehouse, 2),
+                    "percentage": round((total_warehouse / total_costs * 100) if total_costs > 0 else 0, 2)
+                },
+                {
+                    "category": "Delivery Costs",
+                    "amount": round(total_delivery, 2),
+                    "percentage": round((total_delivery / total_costs * 100) if total_costs > 0 else 0, 2)
+                }
+            ],
+            "date_range": date_range
+        }
     except Exception as e:
         logger.error(f"Error fetching B2B cost structure analysis: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch B2B cost structure analysis: {str(e)}")
@@ -2193,11 +2878,78 @@ async def get_b2b_product_profit_analysis(
         purchase_price_service = get_b2b_purchase_price_service()
         date_range = format_date_range(date_from, date_to)
         
-        # Try to get product-level sales data
-        product_sales = await client.get_product_level_sales(date_from, date_to)
+        # First, try to get daily transaction-level data for accurate calculations
+        daily_sales = await client.get_daily_sales_data(date_from, date_to)
+        use_daily_data = daily_sales and "items" in daily_sales and len(daily_sales.get("items", [])) > 0
         
-        if not product_sales or "items" not in product_sales or len(product_sales.get("items", [])) == 0:
-            # If no product-level data, return empty structure
+        if use_daily_data:
+            # Calculate on daily basis: for each day, calculate revenue and COGS, then sum
+            product_data: Dict[str, Dict[str, Any]] = defaultdict(lambda: {
+                "product_name": "",
+                "total_revenue": 0.0,
+                "total_quantity_kg": 0.0,
+                "order_ids": set(),
+                "total_cogs": 0.0,
+                "warehouse_costs": 0.0,
+                "delivery_costs": 0.0,
+                "purchase_price_sources": defaultdict(int),
+                "days_with_data": set(),
+                "order_count": 0
+            })
+            
+            # Process each daily transaction
+            for item in daily_sales["items"]:
+                product_name = item.get("product_name") or item.get("product_id", "")
+                if not product_name:
+                    continue
+                
+                # Get daily transaction data from new MCP structure
+                order_date_str = item.get("order_date") or item.get("sale_date") or item.get("date")
+                quantity_kg = float(item.get("quantity_sold", 0.0) or item.get("quantity_kg", 0.0) or item.get("quantity", 0.0))
+                # Use total_revenue from MCP (already calculated correctly per day)
+                daily_revenue = float(item.get("total_revenue", 0.0) or item.get("revenue", 0.0))
+                num_orders = int(item.get("number_of_orders", 0))
+                
+                if quantity_kg <= 0:
+                    continue
+                
+                # Parse order date
+                try:
+                    if isinstance(order_date_str, str):
+                        order_date = dt.strptime(order_date_str.split("T")[0], "%Y-%m-%d").date()
+                    else:
+                        order_date = order_date_str
+                except:
+                    continue
+                
+                # Get purchase price for this specific order date (with next-day offset)
+                purchase_price, source = purchase_price_service.get_purchase_price_for_sale_date(
+                    product_name, order_date
+                )
+                
+                # Calculate daily COGS = purchase_price × quantity
+                daily_cogs = purchase_price * quantity_kg if purchase_price > 0 else 0.0
+                
+                # Calculate daily warehouse and delivery costs (3 birr/kg and 2 birr/kg)
+                daily_warehouse = quantity_kg * 3.0
+                daily_delivery = quantity_kg * 2.0
+                
+                # Aggregate by product
+                prod = product_data[product_name]
+                prod["product_name"] = product_name
+                prod["total_revenue"] += daily_revenue
+                prod["total_quantity_kg"] += quantity_kg
+                prod["total_cogs"] += daily_cogs
+                prod["warehouse_costs"] += daily_warehouse
+                prod["delivery_costs"] += daily_delivery
+                prod["purchase_price_sources"][source] += 1
+                prod["days_with_data"].add(order_date)
+                # Track order count from number_of_orders field
+                prod["order_count"] = prod.get("order_count", 0) + num_orders
+        
+        if not use_daily_data:
+            # No daily data available - return empty (new MCP should always provide daily data)
+            logger.warning("Daily product orders data not available from new MCP endpoint")
             return {
                 "products": [],
                 "summary": {
@@ -2207,75 +2959,7 @@ async def get_b2b_product_profit_analysis(
                     "avg_profit_margin": 0
                 },
                 "period": date_range,
-                "error": "Product-level sales data not available from MCP endpoint"
-            }
-        
-        # Aggregate product data
-        product_data: Dict[str, Dict[str, Any]] = defaultdict(lambda: {
-            "product_name": "",
-            "total_revenue": 0.0,
-            "total_quantity_kg": 0.0,
-            "order_ids": set(),
-            "total_cogs": 0.0,
-            "warehouse_costs": 0.0,
-            "delivery_costs": 0.0,
-            "purchase_price_sources": defaultdict(int),
-            "days_with_data": set()
-        })
-        
-        # Process each item (from get_product_profitability_ranking - aggregated data)
-        for item in product_sales["items"]:
-            product_name = item.get("product_name") or item.get("product_id", "")
-            if not product_name:
-                continue
-            
-            # Get aggregated values from MCP response
-            total_revenue = float(item.get("total_revenue", 0.0))
-            total_quantity_sold = float(item.get("total_quantity_sold", 0.0))  # In units, may need conversion
-            order_count = int(item.get("order_count", 0))
-            mcp_cogs = float(item.get("total_cogs", 0.0))
-            mcp_warehouse = float(item.get("total_warehouse_cost", 0.0))
-            mcp_delivery = float(item.get("total_delivery_cost", 0.0))
-            
-            # Parse date range to calculate average purchase price
-            try:
-                from_date = dt.strptime(date_range["from"], "%Y-%m-%d").date()
-                to_date = dt.strptime(date_range["to"], "%Y-%m-%d").date()
-                # Use middle date of range for purchase price lookup (approximation)
-                middle_date = from_date + timedelta(days=(to_date - from_date).days // 2)
-            except:
-                middle_date = date.today()
-            
-            # Get purchase price for middle of date range (with next-day offset)
-            purchase_price, source = purchase_price_service.get_purchase_price_for_sale_date(
-                product_name, middle_date
-            )
-            
-            # Use purchase price to recalculate COGS if available, otherwise use MCP's COGS
-            if purchase_price > 0 and total_quantity_sold > 0:
-                # Assume total_quantity_sold is in kg (or convert if needed)
-                # For now, treating it as kg since MCP calculates costs per kg
-                recalculated_cogs = purchase_price * total_quantity_sold
-                actual_cogs = recalculated_cogs
-            else:
-                # Fallback to MCP's COGS calculation
-                actual_cogs = mcp_cogs
-                purchase_price = (mcp_cogs / total_quantity_sold) if total_quantity_sold > 0 else 0.0
-                source = "mcp_fallback"
-            
-            # Store product data
-            product_data[product_name] = {
-                "product_name": product_name,
-                "total_revenue": total_revenue,
-                "total_quantity_kg": total_quantity_sold,  # Assuming it's in kg
-                "order_ids": set(),  # We don't have individual order IDs from aggregated data
-                "total_cogs": actual_cogs,
-                "warehouse_costs": mcp_warehouse,
-                "delivery_costs": mcp_delivery,
-                "purchase_price_sources": {source: 1},
-                "days_with_data": set(),  # We don't have individual dates from aggregated data
-                "order_count": order_count,
-                "purchase_price_used": purchase_price
+                "error": "Daily product orders data not available from MCP endpoint"
             }
         
         # Convert to list and calculate final metrics
@@ -2292,15 +2976,20 @@ async def get_b2b_product_profit_analysis(
             margin = (profit / revenue * 100) if revenue > 0 else 0.0
             profit_per_kg = (profit / data["total_quantity_kg"]) if data["total_quantity_kg"] > 0 else 0.0
             
-            # Get average purchase price used
-            total_items = sum(data["purchase_price_sources"].values())
+            # Calculate average purchase price used (weighted by quantity if daily data)
+            # For aggregated data, this is the single price used
+            # For daily data, this is the weighted average
             avg_purchase_price = (cogs / data["total_quantity_kg"]) if data["total_quantity_kg"] > 0 else 0.0
+            
+            # Calculate average selling price per kg (for display only - revenue is already correctly calculated)
+            avg_selling_price = (revenue / data["total_quantity_kg"]) if data["total_quantity_kg"] > 0 else 0.0
             
             products_list.append({
                 "product_name": product_name,
                 "total_revenue": round(revenue, 2),
                 "total_quantity_kg": round(data["total_quantity_kg"], 2),
                 "total_orders": data.get("order_count", len(data["order_ids"])),
+                "avg_selling_price": round(avg_selling_price, 2),
                 "purchase_price_used": round(data.get("purchase_price_used", avg_purchase_price), 2),
                 "total_cogs": round(cogs, 2),
                 "warehouse_costs": round(warehouse, 2),
@@ -2328,7 +3017,9 @@ async def get_b2b_product_profit_analysis(
                 "total_profit": round(total_profit, 2),
                 "avg_profit_margin": round(avg_margin, 2)
             },
-            "period": date_range
+            "period": date_range,
+            "calculation_method": "daily_transactions",
+            "note": "Calculated using daily transactions: revenue and COGS calculated per day (revenue = total_revenue per day, COGS = purchase_price × quantity per day), then summed across all days."
         }
         
     except Exception as e:
@@ -2342,15 +3033,42 @@ async def get_b2b_revenue_trends(
     date_to: Optional[str] = Query(None, description="End date (YYYY-MM-DD)"),
     granularity: Optional[str] = Query("day", description="Granularity: day, week, month")
 ):
-    """Get B2B revenue trends over time."""
+    """Get B2B revenue trends over time. Calculated from daily product orders."""
     try:
+        from collections import defaultdict
+        
         client = get_b2b_mcp_client()
         date_range = format_date_range(date_from, date_to)
-        result = await client.call_tool("get_revenue_trends", {
-            "date_range": date_range,
+        
+        # Get daily product orders data
+        daily_sales = await client.get_daily_sales_data(date_from, date_to)
+        
+        if not daily_sales or "items" not in daily_sales or len(daily_sales.get("items", [])) == 0:
+            return {
+                "trends": [],
+                "period": date_range,
+                "error": "No B2B data available for the specified date range"
+            }
+        
+        # Aggregate revenue by date
+        revenue_by_date = defaultdict(float)
+        for item in daily_sales["items"]:
+            order_date_str = item.get("order_date") or item.get("sale_date")
+            revenue = float(item.get("total_revenue", 0.0) or item.get("revenue", 0.0))
+            if order_date_str and revenue > 0:
+                revenue_by_date[order_date_str] += revenue
+        
+        # Convert to list sorted by date
+        trends = [
+            {"date": date_str, "revenue": round(revenue, 2)}
+            for date_str, revenue in sorted(revenue_by_date.items())
+        ]
+        
+        return {
+            "trends": trends,
+            "period": date_range,
             "granularity": granularity
-        })
-        return result
+        }
     except Exception as e:
         logger.error(f"Error fetching B2B revenue trends: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch B2B revenue trends: {str(e)}")
@@ -2361,12 +3079,24 @@ async def get_b2b_cash_flow_analysis(
     date_from: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
     date_to: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
 ):
-    """Get B2B cash flow analysis: cash in/out by payment method."""
+    """Get B2B cash flow analysis: cash in/out by payment method.
+    
+    Note: The new Product Orders MCP does not provide cash flow data.
+    This endpoint returns a placeholder response indicating the feature is not available.
+    """
     try:
-        client = get_b2b_mcp_client()
         date_range = format_date_range(date_from, date_to)
-        result = await client.call_tool("get_cash_flow_analysis", {"date_range": date_range})
-        return result
+        # The new Product Orders MCP only provides getDailyProductOrders
+        # Cash flow analysis is not available from this MCP endpoint
+        return {
+            "cash_in": 0,
+            "cash_out": 0,
+            "net_cash_flow": 0,
+            "payment_methods": {},
+            "period": date_range,
+            "error": "Cash flow analysis is not available from the Product Orders MCP. This feature requires payment method data which is not provided by the current MCP endpoint.",
+            "note": "The Product Orders MCP only provides daily product order statistics (getDailyProductOrders). Cash flow data would require a different data source."
+        }
     except Exception as e:
         logger.error(f"Error fetching B2B cash flow analysis: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch B2B cash flow analysis: {str(e)}")
@@ -2409,15 +3139,12 @@ async def get_b2b_payment_behavior(
     date_from: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
     date_to: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
 ):
-    """Get B2B payment behavior: payment history & DSO."""
-    try:
-        client = get_b2b_mcp_client()
-        date_range = format_date_range(date_from, date_to)
-        result = await client.call_tool("get_customer_payment_behavior", {"date_range": date_range})
-        return result
-    except Exception as e:
-        logger.error(f"Error fetching B2B payment behavior: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to fetch B2B payment behavior: {str(e)}")
+    """Get B2B payment behavior: payment history & DSO. Not available with current MCP endpoint."""
+    return {
+        "error": "Payment behavior analysis not available with the current Product Orders MCP endpoint",
+        "note": "This feature requires additional customer payment data that is not provided by the current MCP.",
+        "period": format_date_range(date_from, date_to)
+    }
 
 
 if __name__ == "__main__":

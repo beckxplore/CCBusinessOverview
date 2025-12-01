@@ -307,6 +307,59 @@ export interface OperationalCost {
   optimization_potential: 'Low' | 'Medium' | 'High';
 }
 
+export interface DailyOperationalCost {
+  date: string;
+  warehouse_cost_per_kg: number | null;
+  fulfilment_cost_per_kg: number | null;
+  last_mile_cost_per_kg: number | null;
+}
+
+export interface DailyOperationalCostsResponse {
+  daily_costs: DailyOperationalCost[];
+  count: number;
+  date_range?: {
+    from: string | null;
+    to: string | null;
+  } | null;
+}
+
+export interface DailyRealMargin {
+  date: string;
+  volume_kg: number;
+  revenue_etb: number;
+  procurement_cost_etb: number;
+  warehouse_cost_etb: number;
+  fulfilment_cost_etb: number;
+  last_mile_cost_etb: number;
+  total_operational_cost_etb: number;
+  warehouse_cost_per_kg: number;
+  fulfilment_cost_per_kg: number;
+  last_mile_cost_per_kg: number;
+  total_operational_cost_per_kg: number;
+  total_cost_etb: number;
+  margin_etb: number;
+  margin_pct: number;
+}
+
+export interface DailyRealMarginsResponse {
+  daily_margins: DailyRealMargin[];
+  count: number;
+  date_range?: {
+    from: string | null;
+    to: string | null;
+  } | null;
+  error?: string;
+}
+
+export interface LatestOperationalCostsResponse {
+  warehouse_cost_per_kg: number;
+  fulfilment_cost_per_kg: number;
+  last_mile_cost_per_kg: number;
+  total_cost_per_kg: number;
+  source: 'daily' | 'static';
+  date: string | null;
+}
+
 export interface SGLTier {
   tier_name: string;
   description: string;
@@ -507,6 +560,7 @@ export interface B2BProductProfitAnalysis {
     total_revenue: number;
     total_quantity_kg: number;
     total_orders: number;
+    avg_selling_price: number;
     purchase_price_used: number;
     total_cogs: number;
     warehouse_costs: number;

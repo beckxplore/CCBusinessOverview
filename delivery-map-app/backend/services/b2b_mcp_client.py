@@ -50,35 +50,32 @@ class B2BMCPClient:
         self, 
         tool_name: str, 
         arguments: Dict[str, Any],
-        use_rest: bool = True
+        use_rest: bool = False
     ) -> Dict[str, Any]:
         """
-        Call an MCP tool.
+        Call an MCP tool using JSON-RPC 2.0 format (Product Orders MCP).
         
         Args:
-            tool_name: Name of the tool to call (e.g., 'get_business_overview')
+            tool_name: Name of the tool to call (e.g., 'getDailyProductOrders')
             arguments: Arguments to pass to the tool
-            use_rest: If True, use REST API format; if False, use JSON-RPC 2.0
+            use_rest: If True, use REST API format; if False, use JSON-RPC 2.0 (default)
         
         Returns:
             Response data from the MCP server
         """
         try:
             if use_rest:
-                # REST API format (ChatGPT compatible)
+                # REST API format (ChatGPT compatible) - fallback for old endpoints
                 url = f"{self.endpoint}/api/tools/{tool_name}"
                 response = await self.session.post(url, json=arguments)
             else:
-                # JSON-RPC 2.0 format
+                # JSON-RPC 2.0 format (used by Product Orders MCP)
                 url = self.endpoint
                 payload = {
                     "jsonrpc": "2.0",
                     "id": "1",
-                    "method": "tools/call",
-                    "params": {
-                        "name": tool_name,
-                        "arguments": arguments
-                    }
+                    "method": tool_name,  # Direct method name (e.g., "getDailyProductOrders")
+                    "params": arguments
                 }
                 response = await self.session.post(url, json=payload)
             
@@ -86,9 +83,17 @@ class B2BMCPClient:
             data = response.json()
             
             # Handle JSON-RPC response format
-            if not use_rest and "result" in data:
-                return data["result"]
+            if "result" in data:
+                result = data["result"]
+                # The Product Orders MCP returns the data directly in result
+                # It could be a list or a dict with data
+                return result
+            elif "error" in data:
+                error_info = data["error"]
+                error_msg = error_info.get("message", str(error_info)) if isinstance(error_info, dict) else str(error_info)
+                raise Exception(f"MCP API error: {error_msg}")
             
+            # If no result/error, return the whole response (might be direct data)
             return data
             
         except httpx.HTTPStatusError as e:
@@ -101,14 +106,121 @@ class B2BMCPClient:
             logger.error(f"Unexpected error calling {tool_name}: {str(e)}")
             raise
     
+    async def get_daily_sales_data(
+        self,
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Fetch daily transaction-level B2B sales data from Product Orders MCP endpoint.
+        Uses getDailyProductOrders which provides daily product order statistics grouped by date, product, and customer type.
+        
+        Args:
+            date_from: Start date (YYYY-MM-DD) or None for default
+            date_to: End date (YYYY-MM-DD) or None for today
+            
+        Returns:
+            Daily sales data with items containing:
+            - product_name
+            - order_date (YYYY-MM-DD) - delivery date or order date
+            - quantity_sold (total quantity for that day/product/customer_type)
+            - total_revenue (total revenue for that day/product/customer_type)
+            - unit_price (average price per unit for that day/product/customer_type)
+            - number_of_orders
+            - customer_type
+        """
+        date_range = format_date_range(date_from, date_to)
+        
+        # Use getDailyProductOrders from the Product Orders MCP
+        try:
+            result = await self.call_tool(
+                "getDailyProductOrders",
+                {
+                    "startDate": date_range["from"],
+                    "endDate": date_range["to"]
+                },
+                use_rest=False  # Use JSON-RPC 2.0 format
+            )
+            
+            # Transform the response to match expected format
+            # The Product Orders MCP returns an array of daily product orders
+            # The JSON-RPC result could be a list directly, or wrapped in a dict
+            items = []
+            
+            # Handle different response formats
+            if isinstance(result, list):
+                # Direct list of items
+                data_list = result
+            elif isinstance(result, dict):
+                # Could be wrapped in a dict - check for common keys
+                if "data" in result:
+                    data_list = result["data"]
+                elif "items" in result:
+                    data_list = result["items"]
+                elif "orders" in result:
+                    data_list = result["orders"]
+                else:
+                    # Try to extract list from dict values
+                    # If it's a dict with array-like structure, get the first list value
+                    list_values = [v for v in result.values() if isinstance(v, list)]
+                    if list_values:
+                        data_list = list_values[0]
+                    else:
+                        logger.warning(f"Could not find list data in dict result: {list(result.keys())}")
+                        data_list = []
+            else:
+                logger.warning(f"Unexpected response type from getDailyProductOrders: {type(result)}")
+                data_list = []
+            
+            # Process the list of items
+            for row in data_list:
+                # Map the MCP response structure to our expected format
+                # Each row is already aggregated by date + product + customer_type
+                items.append({
+                    "product_name": row.get("product_name", ""),
+                    "product_id": row.get("product_id"),
+                    "sale_date": row.get("order_date"),  # Use order_date as sale_date
+                    "order_date": row.get("order_date"),
+                    "quantity_kg": float(row.get("quantity_sold", 0.0)),  # quantity_sold from MCP
+                    "quantity": float(row.get("quantity_sold", 0.0)),  # Alias
+                    "quantity_sold": float(row.get("quantity_sold", 0.0)),
+                    "total_revenue": float(row.get("total_revenue", 0.0)),
+                    "revenue": float(row.get("total_revenue", 0.0)),  # Alias for compatibility
+                    "unit_price": float(row.get("unit_price", 0.0)),
+                    "selling_price": float(row.get("unit_price", 0.0)),  # unit_price is average price per unit
+                    "price": float(row.get("unit_price", 0.0)),  # Alias
+                    "number_of_orders": int(row.get("number_of_orders", 0)),
+                    "order_count": int(row.get("number_of_orders", 0)),  # Alias
+                    "customer_type": row.get("customer_type"),
+                    "customer_type_id": row.get("customer_type_id")
+                })
+            
+            logger.info(f"Retrieved {len(items)} daily product order records from Product Orders MCP")
+            return {
+                "items": items,
+                "period": date_range,
+                "summary": {
+                    "total_items": len(items),
+                    "date_range": date_range
+                }
+            }
+                
+        except Exception as e:
+            logger.error(f"Failed to get daily product orders from Product Orders MCP: {e}")
+            return {
+                "items": [],
+                "period": date_range,
+                "error": f"Daily transaction-level data not available: {str(e)}"
+            }
+    
     async def get_product_level_sales(
         self,
         date_from: Optional[str] = None,
         date_to: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Fetch product-level B2B sales data from MCP endpoint.
-        Uses get_product_profitability_ranking which returns aggregated product data.
+        Fetch product-level B2B sales data by aggregating daily product orders.
+        Since the new Product Orders MCP only provides daily data, we aggregate it by product.
         
         Args:
             date_from: Start date (YYYY-MM-DD) or None for default
@@ -116,39 +228,75 @@ class B2BMCPClient:
             
         Returns:
             Product-level sales data with items containing:
-            - product_name or product_id
-            - total_quantity_sold (in units, may need conversion to kg)
+            - product_name
+            - total_quantity_sold (in kg)
             - total_revenue
-            - total_cogs
             - order_count
         """
         date_range = format_date_range(date_from, date_to)
         
-        # Use get_product_profitability_ranking which returns product-level aggregated data
+        # Get daily data and aggregate by product
         try:
-            result = await self.call_tool(
-                "get_product_profitability_ranking",
-                {"date_range": date_range, "limit": 1000}  # Get all products
-            )
+            daily_data = await self.get_daily_sales_data(date_from, date_to)
             
-            # Transform the response to match expected format
+            if not daily_data or "items" not in daily_data or len(daily_data.get("items", [])) == 0:
+                return {
+                    "items": [],
+                    "period": date_range,
+                    "error": "No daily product order data available"
+                }
+            
+            # Aggregate daily data by product
+            from collections import defaultdict
+            product_aggregates = defaultdict(lambda: {
+                "product_name": "",
+                "product_id": None,
+                "total_quantity_sold": 0.0,
+                "total_revenue": 0.0,
+                "order_count": 0
+            })
+            
+            for item in daily_data["items"]:
+                product_name = item.get("product_name")
+                if not product_name:
+                    continue
+                
+                prod = product_aggregates[product_name]
+                prod["product_name"] = product_name
+                prod["product_id"] = item.get("product_id")
+                prod["total_quantity_sold"] += float(item.get("quantity_sold") or item.get("quantity_kg") or 0.0)
+                prod["total_revenue"] += float(item.get("total_revenue") or item.get("revenue") or 0.0)
+                prod["order_count"] += int(item.get("number_of_orders") or item.get("order_count") or 0)
+            
+            # Convert to list format
             items = []
-            if "top_performers" in result:
-                items.extend(result["top_performers"])
-            if "bottom_performers" in result:
-                items.extend(result["bottom_performers"])
+            for product_name, data in product_aggregates.items():
+                items.append({
+                    "product_name": product_name,
+                    "product_id": data["product_id"],
+                    "total_quantity_sold": round(data["total_quantity_sold"], 2),
+                    "total_revenue": round(data["total_revenue"], 2),
+                    "order_count": data["order_count"]
+                })
+            
+            # Sort by revenue descending
+            items.sort(key=lambda x: x["total_revenue"], reverse=True)
             
             return {
                 "items": items,
-                "period": result.get("period", date_range),
-                "summary": result.get("summary", {})
+                "period": date_range,
+                "summary": {
+                    "total_products": len(items),
+                    "total_revenue": sum(item["total_revenue"] for item in items),
+                    "total_quantity": sum(item["total_quantity_sold"] for item in items)
+                }
             }
         except Exception as e:
-            logger.warning(f"get_product_profitability_ranking tool not available: {e}")
-            # Return empty structure - we'll handle this in the calling code
+            logger.error(f"Failed to get product-level sales data: {e}")
             return {
                 "items": [],
-                "error": f"Product-level sales data not available from MCP endpoint: {str(e)}"
+                "period": date_range,
+                "error": f"Product-level sales data not available: {str(e)}"
             }
     
     async def close(self):

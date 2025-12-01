@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ApiClient } from '../../utils/apiClient';
+import { DataStore } from '../../utils/dataStore';
 import { KPICard } from '../Overview/KPICard';
 import { 
   Users, 
@@ -28,15 +29,35 @@ export const B2BCustomerPage: React.FC = () => {
   const [creditRisk, setCreditRisk] = useState<B2BCreditRiskDashboard | null>(null);
   const [paymentBehavior, setPaymentBehavior] = useState<B2BPaymentBehavior | null>(null);
 
-  // Set default date range (last 30 days)
+  // Use global date range from DataStore
   useEffect(() => {
-    const today = new Date();
-    const thirtyDaysAgo = new Date(today);
-    thirtyDaysAgo.setDate(today.getDate() - 30);
-    
-    setDateTo(today.toISOString().split('T')[0]);
-    setDateFrom(thirtyDaysAgo.toISOString().split('T')[0]);
-  }, []);
+    const updateDates = () => {
+      const metricsWindow = DataStore.getMetricsWindow();
+      if (metricsWindow && metricsWindow.start && metricsWindow.end) {
+        // Only update if dates have changed
+        if (dateFrom !== metricsWindow.start || dateTo !== metricsWindow.end) {
+          setDateFrom(metricsWindow.start);
+          setDateTo(metricsWindow.end);
+        }
+      } else {
+        // Fallback to last 30 days if no global window is set
+        const today = new Date();
+        const thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        const defaultFrom = thirtyDaysAgo.toISOString().split('T')[0];
+        const defaultTo = today.toISOString().split('T')[0];
+        if (dateFrom !== defaultFrom || dateTo !== defaultTo) {
+          setDateFrom(defaultFrom);
+          setDateTo(defaultTo);
+        }
+      }
+    };
+
+    updateDates();
+    // Check for updates periodically (when global date range changes)
+    const interval = setInterval(updateDates, 500); // Check every 500ms for faster sync
+    return () => clearInterval(interval);
+  }, [dateFrom, dateTo]); // Include dateFrom and dateTo in dependencies
 
   useEffect(() => {
     if (dateFrom && dateTo) {
@@ -89,26 +110,35 @@ export const B2BCustomerPage: React.FC = () => {
 
   return (
     <div className="h-full overflow-auto bg-gray-50 p-6 space-y-6">
-      {/* Date Range Selector */}
+      {/* Date Range Display (read-only, controlled by Overview page) */}
       <div className="bg-white rounded-lg shadow p-4 flex items-center gap-4">
         <Calendar className="text-gray-500" size={20} />
-        <label className="text-sm font-medium text-gray-700">From:</label>
-        <input
-          type="date"
-          value={dateFrom}
-          onChange={(e) => setDateFrom(e.target.value)}
-          className="border border-gray-300 rounded px-3 py-1 text-sm"
-        />
-        <label className="text-sm font-medium text-gray-700">To:</label>
-        <input
-          type="date"
-          value={dateTo}
-          onChange={(e) => setDateTo(e.target.value)}
-          className="border border-gray-300 rounded px-3 py-1 text-sm"
-        />
+        <div className="flex items-center gap-4 flex-1">
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-600">From:</label>
+            <input
+              type="date"
+              value={dateFrom}
+              readOnly
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 text-gray-600 cursor-not-allowed"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-600">To:</label>
+            <input
+              type="date"
+              value={dateTo}
+              readOnly
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 text-gray-600 cursor-not-allowed"
+            />
+          </div>
+          <span className="text-xs text-gray-500 ml-auto">
+            Date range controlled by Overview page
+          </span>
+        </div>
         <button
           onClick={loadB2BData}
-          className="ml-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           Refresh
         </button>

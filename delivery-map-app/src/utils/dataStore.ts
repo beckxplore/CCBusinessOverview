@@ -110,6 +110,10 @@ class DataStoreClass {
     return this.metricsWindow;
   }
 
+  setMetricsWindow(window: { start: string; end: string } | null): void {
+    this.metricsWindow = window;
+  }
+
   getWeeklyVolumeMap(): VolumeMap {
     return this.weeklyTotalVolumeMap;
   }

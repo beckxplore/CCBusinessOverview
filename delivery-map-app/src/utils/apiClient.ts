@@ -9,6 +9,9 @@ import type {
   ForecastWeeklySummary,
   ProductCost,
   OperationalCost,
+  DailyOperationalCostsResponse,
+  DailyRealMarginsResponse,
+  LatestOperationalCostsResponse,
   SGLTier,
   ProductMetricsResponse,
   LocalShopPricesResponse,
@@ -105,6 +108,28 @@ export class ApiClient {
 
   static async getOperationalCosts(): Promise<{ costs: OperationalCost[] }> {
     return await this.fetchWithErrorHandling<{ costs: OperationalCost[] }>(`${API_BASE_URL}/costs/operational`);
+  }
+
+  static async getDailyOperationalCosts(dateFrom?: string, dateTo?: string): Promise<DailyOperationalCostsResponse> {
+    const params = new URLSearchParams();
+    if (dateFrom) params.append('date_from', dateFrom);
+    if (dateTo) params.append('date_to', dateTo);
+    const queryString = params.toString();
+    const url = `${API_BASE_URL}/costs/daily-operational${queryString ? `?${queryString}` : ''}`;
+    return await this.fetchWithErrorHandling<DailyOperationalCostsResponse>(url);
+  }
+
+  static async getDailyRealMargins(dateFrom?: string, dateTo?: string): Promise<DailyRealMarginsResponse> {
+    const params = new URLSearchParams();
+    if (dateFrom) params.append('date_from', dateFrom);
+    if (dateTo) params.append('date_to', dateTo);
+    const queryString = params.toString();
+    const url = `${API_BASE_URL}/margins/daily-real${queryString ? `?${queryString}` : ''}`;
+    return await this.fetchWithErrorHandling<DailyRealMarginsResponse>(url);
+  }
+
+  static async getLatestOperationalCosts(): Promise<LatestOperationalCostsResponse> {
+    return await this.fetchWithErrorHandling<LatestOperationalCostsResponse>(`${API_BASE_URL}/costs/operational/latest`);
   }
 
   static async getSGLTiers(): Promise<{ tiers: SGLTier[] }> {

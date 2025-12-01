@@ -67,6 +67,7 @@ function App() {
   const [data, setData] = useState<DeliveryData[]>([]);
   const [dataWindow, setDataWindow] = useState<{ start: string; end: string } | null>(null);
   const [statistics, setStatistics] = useState<Statistics | null>(null);
+  const [globalMetricsWindow, setGlobalMetricsWindow] = useState<{ start: string; end: string } | null>(null);
   const [markers, setMarkers] = useState<MapMarker[]>([]);
   const [filteredMarkers, setFilteredMarkers] = useState<MapMarker[]>([]);
   const [loading, setLoading] = useState(true);
@@ -507,7 +508,30 @@ function App() {
     return `${startLabel} – ${endLabel}`;
   };
 
-  const activeWeekLabel = formatWeekWindow(statistics?.window ?? dataWindow);
+  // Poll DataStore for global metrics window changes to update header
+  useEffect(() => {
+    const updateGlobalWindow = () => {
+      if (DataStore.isLoaded()) {
+        const window = DataStore.getMetricsWindow();
+        // Only update if window has changed
+        if (window && (!globalMetricsWindow || 
+            globalMetricsWindow.start !== window.start || 
+            globalMetricsWindow.end !== window.end)) {
+          setGlobalMetricsWindow(window);
+        } else if (!window && globalMetricsWindow) {
+          setGlobalMetricsWindow(null);
+        }
+      }
+    };
+    
+    updateGlobalWindow();
+    // Check for updates periodically (when global date range changes)
+    const interval = setInterval(updateGlobalWindow, 500); // Check every 500ms for faster sync
+    return () => clearInterval(interval);
+  }, [globalMetricsWindow]);
+
+  // Use global date range from DataStore if available, otherwise fall back to statistics/dataWindow
+  const activeWeekLabel = formatWeekWindow(globalMetricsWindow ?? statistics?.window ?? dataWindow);
 
 
   if (loading) {

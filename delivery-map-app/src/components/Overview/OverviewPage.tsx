@@ -10,11 +10,14 @@ import {
   TrendingDown, 
   Package, 
   AlertTriangle,
-  Building2
+  Building2,
+  Calendar
 } from 'lucide-react';
-import type { ProductProfitability, B2BBusinessOverview } from '../../types';
+import { DateRangePicker } from '../DateRangePicker';
+import type { ProductProfitability, B2BBusinessOverview, B2BProductProfitAnalysis } from '../../types';
 import { LeaderBasketInsights } from './LeaderBasketInsights';
 import { StapleProductGrid } from './StapleProductGrid';
+import { DailyOperationalCosts } from '../OperationalCosts/DailyOperationalCosts';
 
 const STAPLE_PRODUCTS = [
   'Potato',
@@ -34,7 +37,10 @@ export const OverviewPage: React.FC = () => {
   const [lookbackDays, setLookbackDays] = useState<number>(30);
   const [includeB2B, setIncludeB2B] = useState<boolean>(false);
   const [b2bData, setB2bData] = useState<B2BBusinessOverview | null>(null);
+  const [b2bProductData, setB2bProductData] = useState<B2BProductProfitAnalysis | null>(null);
   const [b2bLoading, setB2bLoading] = useState(false);
+  const [globalDateFrom, setGlobalDateFrom] = useState<string>('');
+  const [globalDateTo, setGlobalDateTo] = useState<string>('');
   const [stapleSummaries, setStapleSummaries] = useState<
     Array<{
       product: string;
@@ -50,6 +56,28 @@ export const OverviewPage: React.FC = () => {
 
   useEffect(() => {
     loadOverview();
+    // Initialize global date range from DataStore
+    const metricsWindow = DataStore.getMetricsWindow();
+    if (metricsWindow) {
+      setGlobalDateFrom(metricsWindow.start);
+      setGlobalDateTo(metricsWindow.end);
+    } else {
+      // Default to last 7 days starting from Nov 10, 2025 (earliest operational cost data)
+      const today = new Date();
+      const minDate = new Date('2025-11-10'); // Earliest date with operational cost data
+      const defaultTo = today.toISOString().split('T')[0];
+      
+      // Calculate default from date: 7 days before today, but not before Nov 10
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(today.getDate() - 6); // 7 days inclusive
+      const defaultFrom = sevenDaysAgo < minDate 
+        ? '2025-11-10' 
+        : sevenDaysAgo.toISOString().split('T')[0];
+      
+      setGlobalDateFrom(defaultFrom);
+      setGlobalDateTo(defaultTo);
+      DataStore.setMetricsWindow({ start: defaultFrom, end: defaultTo });
+    }
   }, []);
 
   useEffect(() => {
@@ -57,8 +85,25 @@ export const OverviewPage: React.FC = () => {
       loadB2BData();
     } else if (!includeB2B) {
       setB2bData(null);
+      setB2bProductData(null);
     }
   }, [includeB2B]);
+
+  // Update global date range when it changes
+  useEffect(() => {
+    if (globalDateFrom && globalDateTo) {
+      DataStore.setMetricsWindow({ start: globalDateFrom, end: globalDateTo });
+      // Force reload data when global date range changes
+      // Note: The API needs to be updated to accept date range parameters
+      // For now, we reload DataStore and then reload overview
+      DataStore.reload().then(() => {
+        loadOverview();
+        if (includeB2B) {
+          loadB2BData();
+        }
+      });
+    }
+  }, [globalDateFrom, globalDateTo]);
 
   const loadOverview = async () => {
     try {
@@ -148,11 +193,16 @@ export const OverviewPage: React.FC = () => {
         dateTo = today.toISOString().split('T')[0];
       }
       
-      const data = await ApiClient.getB2BBusinessOverview(dateFrom, dateTo);
-      setB2bData(data);
+      const [businessData, productData] = await Promise.all([
+        ApiClient.getB2BBusinessOverview(dateFrom, dateTo),
+        ApiClient.getB2BProductProfitAnalysis(dateFrom, dateTo)
+      ]);
+      setB2bData(businessData);
+      setB2bProductData(productData);
     } catch (error) {
       console.error('Failed to load B2B data:', error);
       setB2bData(null);
+      setB2bProductData(null);
     } finally {
       setB2bLoading(false);
     }
@@ -199,6 +249,22 @@ export const OverviewPage: React.FC = () => {
 
   return (
     <div className="h-full overflow-auto bg-gray-50 p-6 space-y-6">
+      {/* Global Date Range Selector */}
+      <div className="bg-white rounded-lg shadow p-4">
+        <div className="flex items-center gap-4 mb-2">
+          <Calendar className="text-gray-500" size={20} />
+          <h3 className="text-sm font-semibold text-gray-700">Global Date Range</h3>
+          <span className="text-xs text-gray-500">(Controls entire dashboard)</span>
+        </div>
+        <DateRangePicker
+          fromDate={globalDateFrom}
+          toDate={globalDateTo}
+          onFromDateChange={setGlobalDateFrom}
+          onToDateChange={setGlobalDateTo}
+          minDate="2025-11-10"
+        />
+      </div>
+
       {/* B2B Toggle */}
       <div className="bg-white rounded-lg shadow p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -326,6 +392,57 @@ export const OverviewPage: React.FC = () => {
           Based on rolling {lookbackDays}-day sales (averaged to weekly volumes).
         </p>
       </div>
+
+      {/* B2B Product Selling Prices */}
+      {includeB2B && b2bProductData && b2bProductData.products && b2bProductData.products.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <Building2 className="mr-2" size={20} />
+            B2B Product Selling Prices
+            <InfoTooltip 
+              content="Average selling prices per kilogram for B2B products during the selected time period."
+            />
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left">Product Name</th>
+                  <th className="px-4 py-2 text-right">Selling Price (ETB/kg)</th>
+                  <th className="px-4 py-2 text-right">Purchase Price (ETB/kg)</th>
+                  <th className="px-4 py-2 text-right">Volume (kg)</th>
+                  <th className="px-4 py-2 text-right">Revenue (ETB)</th>
+                  <th className="px-4 py-2 text-right">Orders</th>
+                </tr>
+              </thead>
+              <tbody>
+                {b2bProductData.products
+                  .sort((a, b) => b.total_revenue - a.total_revenue)
+                  .slice(0, 10)
+                  .map((product, idx) => (
+                    <tr key={product.product_name} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-4 py-2 font-medium">{product.product_name}</td>
+                      <td className="px-4 py-2 text-right font-semibold text-blue-600">
+                        {formatCurrency(product.avg_selling_price, 2)}
+                      </td>
+                      <td className="px-4 py-2 text-right text-gray-600">
+                        {formatCurrency(product.purchase_price_used, 2)}
+                      </td>
+                      <td className="px-4 py-2 text-right">{formatCurrency(product.total_quantity_kg, 1)}</td>
+                      <td className="px-4 py-2 text-right">{formatCurrency(product.total_revenue, 0)}</td>
+                      <td className="px-4 py-2 text-right">{product.total_orders}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            {b2bProductData.products.length > 10 && (
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                Showing top 10 products by revenue. Total: {b2bProductData.products.length} products
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Top Performers and Losses */}
       <div className="grid grid-cols-2 gap-6">
@@ -463,6 +580,9 @@ export const OverviewPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Daily Operational Costs */}
+      <DailyOperationalCosts />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import type { ScenarioParams, ProductCost, SGLTier } from '../../types';
 import { InfoTooltip } from '../Common/InfoTooltip';
 import { associationRules } from '../../data/associationRules';
@@ -38,9 +38,38 @@ export const ScenarioControls: React.FC<ScenarioControlsProps> = ({
   pickupOptimization
 }) => {
   const [activeProduct, setActiveProduct] = useState<string | null>(null);
-  const baseLogisticsCost = 6.41;
+  const [latestCosts, setLatestCosts] = useState<{
+    warehouse: number;
+    fulfilment: number;
+    lastMile: number;
+  } | null>(null);
+  
+  // Default values (will be updated from API)
+  // Logistics = Last mile + fulfilment combined
+  const baseLogisticsCost = latestCosts 
+    ? (latestCosts.lastMile + latestCosts.fulfilment) 
+    : 6.41;
   const basePackagingCost = 2.86;
-  const baseWarehouseCost = 3.46;
+  const baseWarehouseCost = latestCosts?.warehouse ?? 3.46;
+  
+  // Fetch latest operational costs on mount
+  useEffect(() => {
+    const fetchLatestCosts = async () => {
+      try {
+        const { ApiClient } = await import('../../utils/apiClient');
+        const costs = await ApiClient.getLatestOperationalCosts();
+        setLatestCosts({
+          warehouse: costs.warehouse_cost_per_kg,
+          fulfilment: costs.fulfilment_cost_per_kg,
+          lastMile: costs.last_mile_cost_per_kg
+        });
+      } catch (error) {
+        console.error('Failed to fetch latest operational costs:', error);
+        // Keep defaults
+      }
+    };
+    fetchLatestCosts();
+  }, []);
 
   const getMultiplier = (type: 'logistics' | 'packaging' | 'warehouse') =>
     scenario.operationalCostMultipliers?.[type] ?? 1;
