@@ -117,7 +117,7 @@ app.add_middleware(
 )
 
 def get_clickhouse_client():
-    """Create a new ClickHouse client instance."""
+    """Create a new ClickHouse client instance. Returns None if connection fails."""
     try:
         logger.info(f"Connecting to ClickHouse at {CLICKHOUSE_HOST}:{CLICKHOUSE_PORT}")
         client = clickhouse_connect.get_client(
@@ -136,8 +136,8 @@ def get_clickhouse_client():
         logger.info("Successfully connected to ClickHouse")
         return client
     except Exception as e:
-        logger.error(f"Failed to connect to ClickHouse: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Database connection failed: {str(e)}")
+        logger.warning(f"Failed to connect to ClickHouse: {str(e)}")
+        return None
 
 def parse_coordinates(coord_str: str) -> tuple[float, float]:
     """Parse POINT(lon lat) format coordinates."""
@@ -528,16 +528,9 @@ def _fetch_latest_selling_price_map() -> dict[str, float]:
     Query ClickHouse for the latest selling price per product within a recent window.
     Falls back to an empty dict if ClickHouse is unavailable.
     """
-    try:
-        client = get_clickhouse_client()
-    except HTTPException as exc:
-        logger.warning(
-            "ClickHouse unavailable for latest selling prices: %s",
-            exc.detail if hasattr(exc, "detail") else exc,
-        )
-        return {}
-    except Exception as exc:  # pylint: disable=broad-except
-        logger.warning("ClickHouse connection error for latest selling prices: %s", exc)
+    client = get_clickhouse_client()
+    if not client:
+        logger.warning("ClickHouse unavailable for latest selling prices")
         return {}
 
     query = f"""
@@ -698,16 +691,9 @@ def _fetch_latest_weekly_summary() -> Optional[dict[str, Any]]:
     Retrieve the most recent completed week's order count and volume from ClickHouse.
     Returns None if ClickHouse is unavailable or no data is present.
     """
-    try:
-        client = get_clickhouse_client()
-    except HTTPException as exc:
-        logger.warning(
-            "ClickHouse unavailable for weekly summary: %s",
-            exc.detail if hasattr(exc, "detail") else exc,
-        )
-        return None
-    except Exception as exc:  # pylint: disable=broad-except
-        logger.warning("ClickHouse connection error for weekly summary: %s", exc)
+    client = get_clickhouse_client()
+    if not client:
+        logger.warning("ClickHouse unavailable for weekly summary")
         return None
 
     week_start, week_end, week_start_dt, week_end_dt = _get_week_window_datetimes()
@@ -1307,16 +1293,11 @@ def load_product_metrics_data(return_window: bool = False) -> Union[List[Dict[st
     week_end_str = week_end_dt.strftime("%Y-%m-%d %H:%M:%S")
     sales_summary = _get_sales_purchase_summary_for_window(week_start.isoformat(), week_end.isoformat())
 
-    try:
-        client = get_clickhouse_client()
-    except HTTPException as exc:
-        logger.warning("ClickHouse unavailable for product metrics: %s", exc.detail if hasattr(exc, "detail") else exc)
-        client = None
-    except Exception as exc:  # pylint: disable=broad-except
-        logger.warning("ClickHouse connection error for product metrics: %s", exc)
-        client = None
-
-    if client is not None:
+    client = get_clickhouse_client()
+    if not client:
+        logger.warning("ClickHouse unavailable for product metrics")
+    
+    if client:
         try:
             query = f"""
         SELECT
@@ -1506,24 +1487,38 @@ async def health_check():
     """Detailed health check with database connectivity."""
     try:
         client = get_clickhouse_client()
-        result = client.query("SELECT 1 as test")
+        if client:
+            result = client.query("SELECT 1 as test")
+            return {
+                "status": "healthy",
+                "database": "connected",
+                "message": "API and database are operational"
+            }
+        else:
+            # API is healthy even if database is disconnected
+            return {
+                "status": "healthy",
+                "database": "disconnected",
+                "message": "API is operational (database unavailable)"
+            }
+    except Exception as e:
+        # API is still healthy even if database check fails
         return {
             "status": "healthy",
-            "database": "connected",
-            "message": "API and database are operational"
-        }
-    except Exception as e:
-        return {
-            "status": "unhealthy",
             "database": "disconnected",
+            "message": "API is operational (database unavailable)",
             "error": str(e)
         }
 
 @app.get("/api/data")
 def get_delivery_data():
     """Fetch delivery data from ClickHouse."""
+    client = get_clickhouse_client()
+    if not client:
+        logger.warning("ClickHouse unavailable for delivery data")
+        return {"deliveries": [], "message": "Database unavailable"}
+    
     try:
-        client = get_clickhouse_client()
         week_start, week_end, week_start_dt, week_end_dt = _get_week_window_datetimes()
         
         # Override with sheet window if available to ensure consistency across all sources
@@ -1661,8 +1656,12 @@ def get_delivery_data():
 @app.get("/api/statistics")
 def get_statistics():
     """Get aggregated statistics."""
+    client = get_clickhouse_client()
+    if not client:
+        logger.warning("ClickHouse unavailable for statistics")
+        return {"total_orders": 0, "normal_group_orders": 0, "super_group_orders": 0, "unique_locations": 0}
+    
     try:
-        client = get_clickhouse_client()
         week_start, week_end, week_start_dt, week_end_dt = _get_week_window_datetimes()
         
         # Override with sheet window if available to ensure consistency across all sources
@@ -2000,10 +1999,13 @@ def get_persona_leaders(
 
     try:
         client = get_clickhouse_client()
-        sensitivity_maps = compute_leader_sensitivity(client, analysis_start, analysis_end, leader_coords_map)
-        sensitivity_by_phone = sensitivity_maps.get("by_phone", {})
-        sensitivity_by_leader_id = sensitivity_maps.get("by_leader_id", {})
-        sensitivity_by_name = sensitivity_maps.get("by_name", {})
+        if client:
+            sensitivity_maps = compute_leader_sensitivity(client, analysis_start, analysis_end, leader_coords_map)
+            sensitivity_by_phone = sensitivity_maps.get("by_phone", {})
+            sensitivity_by_leader_id = sensitivity_maps.get("by_leader_id", {})
+            sensitivity_by_name = sensitivity_maps.get("by_name", {})
+        else:
+            logger.warning("ClickHouse client unavailable; continuing without sensitivity metrics")
     except HTTPException:
         # Propagate upstream errors (likely ClickHouse configuration issues)
         raise
@@ -2134,11 +2136,20 @@ def get_sgl_retention(
 
     leader_coords_map = _load_leader_coordinate_map()
 
+    client = get_clickhouse_client()
+    if not client:
+        logger.warning("ClickHouse unavailable for SGL retention")
+        return {
+            "products": [],
+            "window": {
+                "start": analysis_start.isoformat(),
+                "end": analysis_end.isoformat(),
+            },
+            "message": "Database unavailable"
+        }
+    
     try:
-        client = get_clickhouse_client()
         retention = compute_weekly_retention(client, analysis_start, analysis_end, leader_coords_map)
-    except HTTPException:
-        raise
     except Exception as exc:  # pylint: disable=broad-except
         logger.error("Failed to compute SGL retention: %s", exc)
         raise HTTPException(status_code=500, detail="Failed to compute SGL retention data") from exc
