@@ -12,6 +12,7 @@ import type {
   DailyOperationalCostsResponse,
   DailyRealMarginsResponse,
   LatestOperationalCostsResponse,
+  WeeklyTrendsResponse,
   SGLTier,
   ProductMetricsResponse,
   LocalShopPricesResponse,
@@ -27,6 +28,7 @@ import type {
   B2BCreditRiskDashboard,
   B2BPaymentBehavior,
   B2BProductProfitAnalysis,
+  DailyProductProfitabilityResponse,
 } from '../types';
 
 function resolveApiBaseUrl(): string {
@@ -38,12 +40,12 @@ function resolveApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
     const { origin } = window.location;
     if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-      return 'http://localhost:8001/api';
+      return 'http://localhost:8000/api';
     }
     return `${origin.replace(/\/$/, '')}/api`;
   }
 
-  return 'http://localhost:8001/api';
+  return 'http://localhost:8000/api';
 }
 
 const API_BASE_URL = resolveApiBaseUrl();
@@ -126,6 +128,11 @@ export class ApiClient {
     const queryString = params.toString();
     const url = `${API_BASE_URL}/margins/daily-real${queryString ? `?${queryString}` : ''}`;
     return await this.fetchWithErrorHandling<DailyRealMarginsResponse>(url);
+  }
+
+  static async getWeeklyTrends(weeks: number = 8): Promise<WeeklyTrendsResponse> {
+    const url = `${API_BASE_URL}/trends/weekly?weeks=${weeks}`;
+    return await this.fetchWithErrorHandling<WeeklyTrendsResponse>(url);
   }
 
   static async getLatestOperationalCosts(): Promise<LatestOperationalCostsResponse> {
@@ -273,5 +280,48 @@ export class ApiClient {
     return await this.fetchWithErrorHandling<B2BProductProfitAnalysis>(
       `${API_BASE_URL}/b2b/product-profit-analysis${query ? `?${query}` : ''}`
     );
+  }
+
+  static async getDailyProductProfitability(
+    dateFrom?: string,
+    dateTo?: string
+  ): Promise<DailyProductProfitabilityResponse> {
+    const params = new URLSearchParams();
+    if (dateFrom) params.append('date_from', dateFrom);
+    if (dateTo) params.append('date_to', dateTo);
+    const query = params.toString();
+    return await this.fetchWithErrorHandling<DailyProductProfitabilityResponse>(
+      `${API_BASE_URL}/products/daily-profitability${query ? `?${query}` : ''}`
+    );
+  }
+
+  // Price Forecasting endpoint
+  static async getPriceForecast(
+    productName: string,
+    currentPrice: number,
+    currentDate?: string,
+    forecastHorizonDays: number = 30,
+    includeAdjustments: boolean = true
+  ): Promise<{ forecast?: any; error?: string }> {
+    const params = new URLSearchParams();
+    params.append('product_name', productName);
+    params.append('current_price', currentPrice.toString());
+    if (currentDate) params.append('current_date', currentDate);
+    params.append('forecast_horizon_days', forecastHorizonDays.toString());
+    params.append('include_adjustments', includeAdjustments.toString());
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/forecast/price?${params.toString()}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return { error: errorData.detail || `HTTP error! status: ${response.status}` };
+      }
+      const data = await response.json();
+      // API returns forecast directly, wrap it for consistency
+      return { forecast: data };
+    } catch (error: any) {
+      console.error(`Price forecast API request failed:`, error);
+      return { error: error?.message || 'Failed to fetch price forecast' };
+    }
   }
 }

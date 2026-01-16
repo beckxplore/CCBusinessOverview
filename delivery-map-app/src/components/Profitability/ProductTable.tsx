@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { ProductProfitability } from '../../types';
 import { formatCurrency, formatPercent, getProfitColor, getProfitBgColor } from '../../utils/profitabilityCalc';
-import { ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowUp, ArrowDown, Search, X } from 'lucide-react';
 
 interface ProductTableProps {
   products: ProductProfitability[];
@@ -10,8 +10,9 @@ interface ProductTableProps {
 }
 
 export const ProductTable: React.FC<ProductTableProps> = ({ products, onProductSelect, selectedProduct }) => {
-  const [sortBy, setSortBy] = useState<keyof ProductProfitability>('weekly_profit');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState<keyof ProductProfitability>('weekly_volume_kg');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleSort = (column: keyof ProductProfitability) => {
     if (sortBy === column) {
@@ -22,16 +23,40 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onProductS
     }
   };
 
-  const sortedProducts = [...products].sort((a, b) => {
-    const aVal = a[sortBy];
-    const bVal = b[sortBy];
-    const multiplier = sortOrder === 'desc' ? -1 : 1;
-    
-    if (typeof aVal === 'number' && typeof bVal === 'number') {
-      return (aVal - bVal) * multiplier;
+  // Filter products by search query (supports both English and Amharic)
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return products;
     }
-    return 0;
-  });
+    // Normalize search query for better Amharic support
+    const query = searchQuery.trim();
+    const queryLower = query.toLowerCase();
+    return products.filter(product => {
+      const productName = product.product;
+      const productLower = productName.toLowerCase();
+      // Support both case-sensitive and case-insensitive search
+      // This works well with Amharic characters
+      return productName.includes(query) || productLower.includes(queryLower);
+    });
+  }, [products, searchQuery]);
+
+  // Sort filtered products
+  const sortedProducts = useMemo(() => {
+    return [...filteredProducts].sort((a, b) => {
+      const aVal = a[sortBy];
+      const bVal = b[sortBy];
+      const multiplier = sortOrder === 'desc' ? -1 : 1;
+      
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return (aVal - bVal) * multiplier;
+      }
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        // Use localeCompare with 'en' locale for proper sorting (works with Amharic)
+        return aVal.localeCompare(bVal, 'en', { sensitivity: 'base' }) * multiplier;
+      }
+      return 0;
+    });
+  }, [filteredProducts, sortBy, sortOrder]);
 
   const SortIcon = ({ column }: { column: keyof ProductProfitability }) => {
     if (sortBy !== column) return null;
@@ -41,8 +66,36 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onProductS
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="p-4 border-b">
-        <h3 className="text-lg font-semibold">Product Profitability</h3>
-        <p className="text-xs text-gray-500 mt-1">Click product to see detailed breakdown</p>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-lg font-semibold">Product Profitability</h3>
+            <p className="text-xs text-gray-500 mt-1">Click product to see detailed breakdown</p>
+          </div>
+        </div>
+        {/* Search Input */}
+        <div className="relative mt-3">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+        {searchQuery && (
+          <p className="text-xs text-gray-500 mt-2">
+            Showing {sortedProducts.length} of {products.length} products
+          </p>
+        )}
       </div>
       
       <div className="overflow-x-auto">
@@ -110,14 +163,16 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onProductS
           </tbody>
           <tfoot className="bg-gray-100 border-t-2">
             <tr className="font-bold">
-              <td className="px-4 py-3">TOTAL</td>
+              <td className="px-4 py-3">
+                {searchQuery ? `TOTAL (${sortedProducts.length} shown)` : 'TOTAL'}
+              </td>
               <td className="px-4 py-3 text-right">-</td>
               <td className="px-4 py-3 text-right">-</td>
               <td className="px-4 py-3 text-right">
-                {formatCurrency(products.reduce((sum, p) => sum + p.weekly_volume_kg, 0), 0)}
+                {formatCurrency(sortedProducts.reduce((sum, p) => sum + p.weekly_volume_kg, 0), 0)}
               </td>
-              <td className={`px-4 py-3 text-right ${getProfitColor(products.reduce((sum, p) => sum + p.weekly_profit, 0))}`}>
-                {formatCurrency(products.reduce((sum, p) => sum + p.weekly_profit, 0), 0)} ETB
+              <td className={`px-4 py-3 text-right ${getProfitColor(sortedProducts.reduce((sum, p) => sum + p.weekly_profit, 0))}`}>
+                {formatCurrency(sortedProducts.reduce((sum, p) => sum + p.weekly_profit, 0), 0)} ETB
               </td>
             </tr>
           </tfoot>

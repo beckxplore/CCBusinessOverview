@@ -159,7 +159,9 @@
       "Red Onion A",
       "Red Onion Grade A",
       "Red Onion Grade A Restaurant q",
-      "Red Onion Grade A Restaurant quality"
+      "Red Onion Grade A Restaurant quality",
+      "Pilled Red onion",
+      "Pilled Red Onion"
     ],
     "benchmark_variants": [
       "Red Onion",
@@ -167,14 +169,18 @@
       "Red Onion A",
       "Red Onion Grade A",
       "Red Onion Grade A Restaurant q",
-      "Red Onion Grade A Restaurant quality"
+      "Red Onion Grade A Restaurant quality",
+      "Pilled Red onion",
+      "Pilled Red Onion"
     ],
     "distribution_variants": [
       "Red Onion",
       "Red onion ( ሃበሻ )",
       "Red Onion (ቀላፎ)",
       "Red Onion A",
-      "Red Onion Grade A"
+      "Red Onion Grade A",
+      "Pilled Red onion",
+      "Pilled Red Onion"
     ]
   },
   {

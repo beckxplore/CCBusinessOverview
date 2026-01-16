@@ -52,12 +52,43 @@ backend_server.log
 Thumbs.db
 .DS_Store
 
-# Test results
+# Test results and screenshots
 test_results/
 final_test_results/
+screenshots/
+analysis/
+*.png
+browser-test-*.png
+
+# Data files
+data_points/*.csv
+data_points/*.pdf
+*.csv
+!payday_calendar_2024_2025.csv
+# Allow specific CSV if needed, otherwise remove the exception above
+
+# Generated analysis and API response files
+analysis_*.json
+api_response*.json
+business_plan_analysis.json
+
+# Cache files
+delivery-map-app/data/*.json
+!delivery-map-app/data/payday_calendar_cache.json
+# Remove exception if cache should be ignored
+
+# Model files (trained ML models)
+delivery-map-app/models/price_forecasting/
+*.pkl
+*.joblib
+*.h5
+*.model
+
+# Test HTML files (keep main index.html)
+delivery-map-app/*test*.html
+delivery-map-app/amharic_*.html
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
-

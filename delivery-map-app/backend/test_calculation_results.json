@@ -1,0 +1,1675 @@
+{
+  "passed": [
+    {
+      "test": "API Health Check",
+      "message": "Backend API is available",
+      "details": null
+    },
+    {
+      "test": "Weekly Profitability: Product Costs Retrieved",
+      "message": "Retrieved 311 products",
+      "details": null
+    },
+    {
+      "test": "Weekly Profitability: Product Metrics Retrieved",
+      "message": "Retrieved 80 product metrics",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Potato",
+      "message": "Total cost = 20.89 + 13.33 + 0.49 = 34.71",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Potato",
+      "message": "Margin = 25.0 - 34.71 = -9.71",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Potato",
+      "message": "Revenue = 25.0 \u00d7 11702.0 = 292550.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Potato",
+      "message": "Profit = -9.71 \u00d7 11702.0 = -113593.52",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Avocado",
+      "message": "Total cost = 79.0 + 13.33 + 0.45 = 92.78",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Avocado",
+      "message": "Margin = 89.0 - 92.78 = -3.78",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Avocado",
+      "message": "Revenue = 89.0 \u00d7 2465.0 = 219385.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Avocado",
+      "message": "Profit = -3.78 \u00d7 2465.0 = -9315.86",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Carrot",
+      "message": "Total cost = 43.0 + 13.33 + 0.47 = 56.80",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Carrot",
+      "message": "Margin = 55.0 - 56.80 = -1.80",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Carrot",
+      "message": "Revenue = 55.0 \u00d7 3101.0 = 170555.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Carrot",
+      "message": "Profit = -1.80 \u00d7 3101.0 = -5580.20",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Beetroot",
+      "message": "Total cost = 26.0 + 13.33 + 0.59 = 39.92",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Beetroot",
+      "message": "Margin = 29.0 - 39.92 = -10.92",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Beetroot",
+      "message": "Revenue = 29.0 \u00d7 3284.0 = 95236.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Beetroot",
+      "message": "Profit = -10.92 \u00d7 3284.0 = -35846.49",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Sweet Potato",
+      "message": "Total cost = 26.0 + 13.33 + 0.57 = 39.90",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Sweet Potato",
+      "message": "Margin = 29.0 - 39.90 = -10.90",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Sweet Potato",
+      "message": "Revenue = 29.0 \u00d7 2366.0 = 68614.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Sweet Potato",
+      "message": "Profit = -10.90 \u00d7 2366.0 = -25783.29",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Tomato",
+      "message": "Total cost = 43.0 + 13.33 + 0.71 = 57.04",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Tomato",
+      "message": "Margin = 45.0 - 57.04 = -12.04",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Tomato",
+      "message": "Revenue = 45.0 \u00d7 7367.0 = 331515.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Tomato",
+      "message": "Profit = -12.04 \u00d7 7367.0 = -88667.88",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Papaya",
+      "message": "Total cost = 80.0 + 13.33 + 0.50 = 93.83",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Papaya",
+      "message": "Margin = 73.0 - 93.83 = -20.83",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Papaya",
+      "message": "Revenue = 73.0 \u00d7 536.0 = 39128.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Papaya",
+      "message": "Profit = -20.83 \u00d7 536.0 = -11162.51",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Ater Kik",
+      "message": "Total cost = 165.0 + 0.0 + 0.00 = 165.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Ater Kik",
+      "message": "Margin = 170.0 - 165.00 = 5.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Ater Kik",
+      "message": "Revenue = 170.0 \u00d7 147.0 = 24990.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Ater Kik",
+      "message": "Profit = 5.00 \u00d7 147.0 = 735.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Cucumber",
+      "message": "Total cost = 13.75 + 0.0 + 0.00 = 13.75",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Cucumber",
+      "message": "Margin = 19.0 - 13.75 = 5.25",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Cucumber",
+      "message": "Revenue = 19.0 \u00d7 481.0 = 9139.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Cucumber",
+      "message": "Profit = 5.25 \u00d7 481.0 = 2525.25",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: White cabbage",
+      "message": "Total cost = 17.5 + 0.0 + 0.00 = 17.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: White cabbage",
+      "message": "Margin = 21.0 - 17.50 = 3.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: White cabbage",
+      "message": "Revenue = 21.0 \u00d7 6583.0 = 138243.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: White cabbage",
+      "message": "Profit = 3.50 \u00d7 6583.0 = 23040.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Rice",
+      "message": "Total cost = 116.5 + 0.0 + 0.00 = 116.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Rice",
+      "message": "Margin = 119.0 - 116.50 = 2.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Rice",
+      "message": "Revenue = 119.0 \u00d7 95.0 = 11305.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Rice",
+      "message": "Profit = 2.50 \u00d7 95.0 = 237.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Garlic",
+      "message": "Total cost = 28.75 + 0.0 + 0.00 = 28.75",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Garlic",
+      "message": "Margin = 45.0 - 28.75 = 16.25",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Garlic",
+      "message": "Revenue = 45.0 \u00d7 1647.0 = 74115.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Garlic",
+      "message": "Profit = 16.25 \u00d7 1647.0 = 26763.75",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Orange Valencia",
+      "message": "Total cost = 110.0 + 0.0 + 0.00 = 110.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Orange Valencia",
+      "message": "Margin = 115.0 - 110.00 = 5.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Orange Valencia",
+      "message": "Revenue = 115.0 \u00d7 250.0 = 28750.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Orange Valencia",
+      "message": "Profit = 5.00 \u00d7 250.0 = 1250.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Ginger",
+      "message": "Total cost = 33.0 + 0.0 + 0.00 = 33.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Ginger",
+      "message": "Margin = 49.0 - 33.00 = 16.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Ginger",
+      "message": "Revenue = 49.0 \u00d7 1411.0 = 69139.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Ginger",
+      "message": "Profit = 16.00 \u00d7 1411.0 = 22576.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Lemon",
+      "message": "Total cost = 45.0 + 0.0 + 0.00 = 45.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Lemon",
+      "message": "Margin = 49.0 - 45.00 = 4.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Lemon",
+      "message": "Revenue = 49.0 \u00d7 343.0 = 16807.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Lemon",
+      "message": "Profit = 4.00 \u00d7 343.0 = 1372.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Apple",
+      "message": "Total cost = 425.0 + 0.0 + 0.00 = 425.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Apple",
+      "message": "Margin = 450.0 - 425.00 = 25.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Apple",
+      "message": "Revenue = 450.0 \u00d7 21.0 = 9450.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Apple",
+      "message": "Profit = 25.00 \u00d7 21.0 = 525.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Green Chili (\u1235\u1273\u122d\u1273)",
+      "message": "Total cost = 130.0 + 0.0 + 0.00 = 130.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Green Chili (\u1235\u1273\u122d\u1273)",
+      "message": "Margin = 139.0 - 130.00 = 9.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Green Chili (\u1235\u1273\u122d\u1273)",
+      "message": "Revenue = 139.0 \u00d7 472.0 = 65608.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Green Chili (\u1235\u1273\u122d\u1273)",
+      "message": "Profit = 9.00 \u00d7 472.0 = 4248.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Dachi Ketchup",
+      "message": "Total cost = 126.1 + 0.0 + 0.00 = 126.10",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Dachi Ketchup",
+      "message": "Margin = 135.0 - 126.10 = 8.90",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Dachi Ketchup",
+      "message": "Revenue = 135.0 \u00d7 5.0 = 675.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Dachi Ketchup",
+      "message": "Profit = 8.90 \u00d7 5.0 = 44.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Small Size Potato",
+      "message": "Total cost = 20.89 + 0.0 + 0.00 = 20.89",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Small Size Potato",
+      "message": "Margin = 16.0 - 20.89 = -4.89",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Small Size Potato",
+      "message": "Revenue = 16.0 \u00d7 750.0 = 12000.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Small Size Potato",
+      "message": "Profit = -4.89 \u00d7 750.0 = -3667.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Zucchini",
+      "message": "Total cost = 19.0 + 0.0 + 0.00 = 19.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Zucchini",
+      "message": "Margin = 25.0 - 19.00 = 6.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Zucchini",
+      "message": "Revenue = 25.0 \u00d7 280.0 = 7000.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Zucchini",
+      "message": "Profit = 6.00 \u00d7 280.0 = 1680.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Green Beans",
+      "message": "Total cost = 60.0 + 0.0 + 0.00 = 60.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Green Beans",
+      "message": "Margin = 65.0 - 60.00 = 5.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Green Beans",
+      "message": "Revenue = 65.0 \u00d7 644.0 = 41860.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Green Beans",
+      "message": "Profit = 5.00 \u00d7 644.0 = 3220.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Small Red Onion",
+      "message": "Total cost = 26.0 + 0.0 + 0.00 = 26.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Small Red Onion",
+      "message": "Margin = 19.0 - 26.00 = -7.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Small Red Onion",
+      "message": "Revenue = 19.0 \u00d7 1894.0 = 35986.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Small Red Onion",
+      "message": "Profit = -7.00 \u00d7 1894.0 = -13258.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Cloud Window Cleaner",
+      "message": "Total cost = 72.05 + 0.0 + 0.00 = 72.05",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Cloud Window Cleaner",
+      "message": "Margin = 90.0 - 72.05 = 17.95",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Cloud Window Cleaner",
+      "message": "Revenue = 90.0 \u00d7 1.0 = 90.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Cloud Window Cleaner",
+      "message": "Profit = 17.95 \u00d7 1.0 = 17.95",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Kono beauty soap",
+      "message": "Total cost = 40.0 + 0.0 + 0.00 = 40.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Kono beauty soap",
+      "message": "Margin = 50.0 - 40.00 = 10.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Kono beauty soap",
+      "message": "Revenue = 50.0 \u00d7 304.0 = 15200.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Kono beauty soap",
+      "message": "Profit = 10.00 \u00d7 304.0 = 3040.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Sun Chips (30g)",
+      "message": "Total cost = 20.0 + 0.0 + 0.00 = 20.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Sun Chips (30g)",
+      "message": "Margin = 22.0 - 20.00 = 2.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Sun Chips (30g)",
+      "message": "Revenue = 22.0 \u00d7 22.0 = 484.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Sun Chips (30g)",
+      "message": "Profit = 2.00 \u00d7 22.0 = 44.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Macaroni",
+      "message": "Total cost = 132.91 + 0.0 + 0.00 = 132.91",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Macaroni",
+      "message": "Margin = 135.5 - 132.91 = 2.59",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Macaroni",
+      "message": "Revenue = 135.5 \u00d7 67.0 = 9078.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Macaroni",
+      "message": "Profit = 2.59 \u00d7 67.0 = 173.53",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Red Onion Elfora",
+      "message": "Total cost = 18.0 + 0.0 + 0.00 = 18.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Red Onion Elfora",
+      "message": "Margin = 21.0 - 18.00 = 3.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Red Onion Elfora",
+      "message": "Revenue = 21.0 \u00d7 1190.0 = 24990.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Red Onion Elfora",
+      "message": "Profit = 3.00 \u00d7 1190.0 = 3570.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Kinche Yegebs",
+      "message": "Total cost = 157.0 + 0.0 + 0.00 = 157.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Kinche Yegebs",
+      "message": "Margin = 185.0 - 157.00 = 28.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Kinche Yegebs",
+      "message": "Revenue = 185.0 \u00d7 25.0 = 4625.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Kinche Yegebs",
+      "message": "Profit = 28.00 \u00d7 25.0 = 700.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Bravo Table Tissue",
+      "message": "Total cost = 55.0 + 0.0 + 0.00 = 55.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Bravo Table Tissue",
+      "message": "Margin = 62.0 - 55.00 = 7.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Bravo Table Tissue",
+      "message": "Revenue = 62.0 \u00d7 57.0 = 3534.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Bravo Table Tissue",
+      "message": "Profit = 7.00 \u00d7 57.0 = 399.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Bravo Toilet Paper",
+      "message": "Total cost = 50.0 + 0.0 + 0.00 = 50.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Bravo Toilet Paper",
+      "message": "Margin = 59.0 - 50.00 = 9.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Bravo Toilet Paper",
+      "message": "Revenue = 59.0 \u00d7 67.0 = 3953.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Bravo Toilet Paper",
+      "message": "Profit = 9.00 \u00d7 67.0 = 603.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Aja Kinche",
+      "message": "Total cost = 157.0 + 0.0 + 0.00 = 157.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Aja Kinche",
+      "message": "Margin = 190.0 - 157.00 = 33.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Aja Kinche",
+      "message": "Revenue = 190.0 \u00d7 383.0 = 72770.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Aja Kinche",
+      "message": "Profit = 33.00 \u00d7 383.0 = 12639.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Lentils (imported)",
+      "message": "Total cost = 225.0 + 0.0 + 0.00 = 225.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Lentils (imported)",
+      "message": "Margin = 236.0 - 225.00 = 11.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Lentils (imported)",
+      "message": "Revenue = 236.0 \u00d7 246.0 = 58056.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Lentils (imported)",
+      "message": "Profit = 11.00 \u00d7 246.0 = 2706.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Difen miser (Imported)",
+      "message": "Total cost = 225.0 + 0.0 + 0.00 = 225.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Difen miser (Imported)",
+      "message": "Margin = 230.0 - 225.00 = 5.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Difen miser (Imported)",
+      "message": "Revenue = 230.0 \u00d7 171.0 = 39330.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Difen miser (Imported)",
+      "message": "Profit = 5.00 \u00d7 171.0 = 855.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Nigist Sanitary Pad",
+      "message": "Total cost = 55.0 + 0.0 + 0.00 = 55.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Nigist Sanitary Pad",
+      "message": "Margin = 60.0 - 55.00 = 5.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Nigist Sanitary Pad",
+      "message": "Revenue = 60.0 \u00d7 51.0 = 3060.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Nigist Sanitary Pad",
+      "message": "Profit = 5.00 \u00d7 51.0 = 255.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Dachi Vinegar",
+      "message": "Total cost = 29.92 + 0.0 + 0.00 = 29.92",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Dachi Vinegar",
+      "message": "Margin = 32.0 - 29.92 = 2.08",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Dachi Vinegar",
+      "message": "Revenue = 32.0 \u00d7 10.0 = 320.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Dachi Vinegar",
+      "message": "Profit = 2.08 \u00d7 10.0 = 20.80",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Moon Cookies",
+      "message": "Total cost = 14.55 + 0.0 + 0.00 = 14.55",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Moon Cookies",
+      "message": "Margin = 13.0 - 14.55 = -1.55",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Moon Cookies",
+      "message": "Revenue = 13.0 \u00d7 112.0 = 1456.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Moon Cookies",
+      "message": "Profit = -1.55 \u00d7 112.0 = -173.60",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Butter",
+      "message": "Total cost = 650.0 + 0.0 + 0.00 = 650.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Butter",
+      "message": "Margin = 699.0 - 650.00 = 49.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Butter",
+      "message": "Revenue = 699.0 \u00d7 15.0 = 10485.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Butter",
+      "message": "Profit = 49.00 \u00d7 15.0 = 735.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Coffee Latte Cream Biscuit",
+      "message": "Total cost = 10.73 + 0.0 + 0.00 = 10.73",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Coffee Latte Cream Biscuit",
+      "message": "Margin = 13.0 - 10.73 = 2.27",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Coffee Latte Cream Biscuit",
+      "message": "Revenue = 13.0 \u00d7 5.0 = 65.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Coffee Latte Cream Biscuit",
+      "message": "Profit = 2.27 \u00d7 5.0 = 11.35",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Zion biscuit",
+      "message": "Total cost = 9.34 + 0.0 + 0.00 = 9.34",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Zion biscuit",
+      "message": "Margin = 11.0 - 9.34 = 1.66",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Zion biscuit",
+      "message": "Revenue = 11.0 \u00d7 35.0 = 385.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Zion biscuit",
+      "message": "Profit = 1.66 \u00d7 35.0 = 58.10",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Banana/ Raw",
+      "message": "Total cost = 58.0 + 0.0 + 0.00 = 58.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Banana/ Raw",
+      "message": "Margin = 59.0 - 58.00 = 1.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Banana/ Raw",
+      "message": "Revenue = 59.0 \u00d7 788.0 = 46492.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Banana/ Raw",
+      "message": "Profit = 1.00 \u00d7 788.0 = 788.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Eggplant",
+      "message": "Total cost = 55.0 + 0.0 + 0.00 = 55.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Eggplant",
+      "message": "Margin = 59.0 - 55.00 = 4.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Eggplant",
+      "message": "Revenue = 59.0 \u00d7 38.0 = 2242.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Eggplant",
+      "message": "Profit = 4.00 \u00d7 38.0 = 152.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: CK Laundry Soap",
+      "message": "Total cost = 55.0 + 0.0 + 0.00 = 55.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: CK Laundry Soap",
+      "message": "Margin = 60.0 - 55.00 = 5.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: CK Laundry Soap",
+      "message": "Revenue = 60.0 \u00d7 15.0 = 900.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: CK Laundry Soap",
+      "message": "Profit = 5.00 \u00d7 15.0 = 75.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: victory purified natural water",
+      "message": "Total cost = 23.33 + 0.0 + 0.00 = 23.33",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: victory purified natural water",
+      "message": "Margin = 27.0 - 23.33 = 3.67",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: victory purified natural water",
+      "message": "Revenue = 27.0 \u00d7 6.0 = 162.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: victory purified natural water",
+      "message": "Profit = 3.67 \u00d7 6.0 = 22.02",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Juliet Biscuit",
+      "message": "Total cost = 13.39 + 0.0 + 0.00 = 13.39",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Juliet Biscuit",
+      "message": "Margin = 15.0 - 13.39 = 1.61",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Juliet Biscuit",
+      "message": "Revenue = 15.0 \u00d7 23.0 = 345.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Juliet Biscuit",
+      "message": "Profit = 1.61 \u00d7 23.0 = 37.03",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Knick Knack",
+      "message": "Total cost = 22.29 + 0.0 + 0.00 = 22.29",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Knick Knack",
+      "message": "Margin = 24.0 - 22.29 = 1.71",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Knick Knack",
+      "message": "Revenue = 24.0 \u00d7 10.0 = 240.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Knick Knack",
+      "message": "Profit = 1.71 \u00d7 10.0 = 17.10",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Victory Natural Water/Pack",
+      "message": "Total cost = 111.0 + 0.0 + 0.00 = 111.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Victory Natural Water/Pack",
+      "message": "Margin = 138.0 - 111.00 = 27.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Victory Natural Water/Pack",
+      "message": "Revenue = 138.0 \u00d7 3.0 = 414.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Victory Natural Water/Pack",
+      "message": "Profit = 27.00 \u00d7 3.0 = 81.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Moon Coffee Biscuit",
+      "message": "Total cost = 14.55 + 0.0 + 0.00 = 14.55",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Moon Coffee Biscuit",
+      "message": "Margin = 16.0 - 14.55 = 1.45",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Moon Coffee Biscuit",
+      "message": "Revenue = 16.0 \u00d7 34.0 = 544.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Moon Coffee Biscuit",
+      "message": "Profit = 1.45 \u00d7 34.0 = 49.30",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Dabur Herbal Tooth Paste",
+      "message": "Total cost = 49.83 + 0.0 + 0.00 = 49.83",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Dabur Herbal Tooth Paste",
+      "message": "Margin = 56.0 - 49.83 = 6.17",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Dabur Herbal Tooth Paste",
+      "message": "Revenue = 56.0 \u00d7 36.0 = 2016.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Dabur Herbal Tooth Paste",
+      "message": "Profit = 6.17 \u00d7 36.0 = 222.12",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Moya Biscuit",
+      "message": "Total cost = 13.33 + 0.0 + 0.00 = 13.33",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Moya Biscuit",
+      "message": "Margin = 16.0 - 13.33 = 2.67",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Moya Biscuit",
+      "message": "Revenue = 16.0 \u00d7 183.0 = 2928.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Moya Biscuit",
+      "message": "Profit = 2.67 \u00d7 183.0 = 488.61",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Indomie Noodles (Large)",
+      "message": "Total cost = 37.5 + 0.0 + 0.00 = 37.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Indomie Noodles (Large)",
+      "message": "Margin = 41.0 - 37.50 = 3.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Indomie Noodles (Large)",
+      "message": "Revenue = 41.0 \u00d7 63.0 = 2583.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Indomie Noodles (Large)",
+      "message": "Profit = 3.50 \u00d7 63.0 = 220.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Vatika Coconut Hair Oil",
+      "message": "Total cost = 177.78 + 0.0 + 0.00 = 177.78",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Vatika Coconut Hair Oil",
+      "message": "Margin = 185.0 - 177.78 = 7.22",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Vatika Coconut Hair Oil",
+      "message": "Revenue = 185.0 \u00d7 15.0 = 2775.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Vatika Coconut Hair Oil",
+      "message": "Profit = 7.22 \u00d7 15.0 = 108.30",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Lifebuoy 70g",
+      "message": "Total cost = 43.33 + 0.0 + 0.00 = 43.33",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Lifebuoy 70g",
+      "message": "Margin = 46.0 - 43.33 = 2.67",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Lifebuoy 70g",
+      "message": "Revenue = 46.0 \u00d7 33.0 = 1518.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Lifebuoy 70g",
+      "message": "Profit = 2.67 \u00d7 33.0 = 88.11",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Lux 70g",
+      "message": "Total cost = 50.0 + 0.0 + 0.00 = 50.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Lux 70g",
+      "message": "Margin = 55.0 - 50.00 = 5.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Lux 70g",
+      "message": "Revenue = 55.0 \u00d7 59.0 = 3245.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Lux 70g",
+      "message": "Profit = 5.00 \u00d7 59.0 = 295.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Corn Starch",
+      "message": "Total cost = 57.97 + 0.0 + 0.00 = 57.97",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Corn Starch",
+      "message": "Margin = 60.0 - 57.97 = 2.03",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Corn Starch",
+      "message": "Revenue = 60.0 \u00d7 47.0 = 2820.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Corn Starch",
+      "message": "Profit = 2.03 \u00d7 47.0 = 95.41",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Raw Popcorn 500g",
+      "message": "Total cost = 105.0 + 0.0 + 0.00 = 105.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Raw Popcorn 500g",
+      "message": "Margin = 109.5 - 105.00 = 4.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Raw Popcorn 500g",
+      "message": "Revenue = 109.5 \u00d7 15.0 = 1642.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Raw Popcorn 500g",
+      "message": "Profit = 4.50 \u00d7 15.0 = 67.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Beka ButterCups Fasting Biscut",
+      "message": "Total cost = 16.25 + 0.0 + 0.00 = 16.25",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Beka ButterCups Fasting Biscut",
+      "message": "Margin = 17.0 - 16.25 = 0.75",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Beka ButterCups Fasting Biscut",
+      "message": "Revenue = 17.0 \u00d7 60.0 = 1020.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Beka ButterCups Fasting Biscut",
+      "message": "Profit = 0.75 \u00d7 60.0 = 45.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Pure Iodized Salt",
+      "message": "Total cost = 36.0 + 0.0 + 0.00 = 36.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Pure Iodized Salt",
+      "message": "Margin = 39.0 - 36.00 = 3.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Pure Iodized Salt",
+      "message": "Revenue = 39.0 \u00d7 39.0 = 1521.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Pure Iodized Salt",
+      "message": "Profit = 3.00 \u00d7 39.0 = 117.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Rosa Pasta",
+      "message": "Total cost = 85.4 + 0.0 + 0.00 = 85.40",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Rosa Pasta",
+      "message": "Margin = 89.0 - 85.40 = 3.60",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Rosa Pasta",
+      "message": "Revenue = 89.0 \u00d7 260.0 = 23140.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Rosa Pasta",
+      "message": "Profit = 3.60 \u00d7 260.0 = 936.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Original Vaseline Coco Radiant 200ml",
+      "message": "Total cost = 260.87 + 0.0 + 0.00 = 260.87",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Original Vaseline Coco Radiant 200ml",
+      "message": "Margin = 275.0 - 260.87 = 14.13",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Original Vaseline Coco Radiant 200ml",
+      "message": "Revenue = 275.0 \u00d7 5.0 = 1375.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Original Vaseline Coco Radiant 200ml",
+      "message": "Profit = 14.13 \u00d7 5.0 = 70.65",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Original Vaseline Dry Skin Repair 200ml",
+      "message": "Total cost = 260.87 + 0.0 + 0.00 = 260.87",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Original Vaseline Dry Skin Repair 200ml",
+      "message": "Margin = 275.0 - 260.87 = 14.13",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Original Vaseline Dry Skin Repair 200ml",
+      "message": "Revenue = 275.0 \u00d7 5.0 = 1375.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Original Vaseline Dry Skin Repair 200ml",
+      "message": "Profit = 14.13 \u00d7 5.0 = 70.65",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Dania Basmati Rice",
+      "message": "Total cost = 875.68 + 0.0 + 0.00 = 875.68",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Dania Basmati Rice",
+      "message": "Margin = 883.0 - 875.68 = 7.32",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Dania Basmati Rice",
+      "message": "Revenue = 883.0 \u00d7 9.0 = 7947.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Dania Basmati Rice",
+      "message": "Profit = 7.32 \u00d7 9.0 = 65.88",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: CK Powdered Soap (40g)",
+      "message": "Total cost = 12.0 + 0.0 + 0.00 = 12.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: CK Powdered Soap (40g)",
+      "message": "Margin = 18.0 - 12.00 = 6.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: CK Powdered Soap (40g)",
+      "message": "Revenue = 18.0 \u00d7 32.0 = 576.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: CK Powdered Soap (40g)",
+      "message": "Profit = 6.00 \u00d7 32.0 = 192.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: AMG Coffee (Grinded)",
+      "message": "Total cost = 61.0 + 0.0 + 0.00 = 61.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: AMG Coffee (Grinded)",
+      "message": "Margin = 70.0 - 61.00 = 9.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: AMG Coffee (Grinded)",
+      "message": "Revenue = 70.0 \u00d7 5.0 = 350.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: AMG Coffee (Grinded)",
+      "message": "Profit = 9.00 \u00d7 5.0 = 45.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Simba Tomato Paste",
+      "message": "Total cost = 17.19 + 0.0 + 0.00 = 17.19",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Simba Tomato Paste",
+      "message": "Margin = 19.5 - 17.19 = 2.31",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Simba Tomato Paste",
+      "message": "Revenue = 19.5 \u00d7 257.0 = 5011.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Simba Tomato Paste",
+      "message": "Profit = 2.31 \u00d7 257.0 = 593.67",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Black Lion Tea (80g)",
+      "message": "Total cost = 23.9 + 0.0 + 0.00 = 23.90",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Black Lion Tea (80g)",
+      "message": "Margin = 26.0 - 23.90 = 2.10",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Black Lion Tea (80g)",
+      "message": "Revenue = 26.0 \u00d7 438.0 = 11388.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Black Lion Tea (80g)",
+      "message": "Profit = 2.10 \u00d7 438.0 = 919.80",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Crown Powder Detergent (180gm)",
+      "message": "Total cost = 45.29 + 0.0 + 0.00 = 45.29",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Crown Powder Detergent (180gm)",
+      "message": "Margin = 49.0 - 45.29 = 3.71",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Crown Powder Detergent (180gm)",
+      "message": "Revenue = 49.0 \u00d7 51.0 = 2499.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Crown Powder Detergent (180gm)",
+      "message": "Profit = 3.71 \u00d7 51.0 = 189.21",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Rose Laundry Soap (250g)",
+      "message": "Total cost = 58.42 + 0.0 + 0.00 = 58.42",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Rose Laundry Soap (250g)",
+      "message": "Margin = 65.0 - 58.42 = 6.58",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Rose Laundry Soap (250g)",
+      "message": "Revenue = 65.0 \u00d7 124.0 = 8060.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Rose Laundry Soap (250g)",
+      "message": "Profit = 6.58 \u00d7 124.0 = 815.92",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Simba Tea Bag",
+      "message": "Total cost = 58.0 + 0.0 + 0.00 = 58.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Simba Tea Bag",
+      "message": "Margin = 69.0 - 58.00 = 11.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Simba Tea Bag",
+      "message": "Revenue = 69.0 \u00d7 5.0 = 345.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Simba Tea Bag",
+      "message": "Profit = 11.00 \u00d7 5.0 = 55.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Crown Powder Detergent (30g)",
+      "message": "Total cost = 7.14 + 0.0 + 0.00 = 7.14",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Crown Powder Detergent (30g)",
+      "message": "Margin = 12.0 - 7.14 = 4.86",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Crown Powder Detergent (30g)",
+      "message": "Revenue = 12.0 \u00d7 97.0 = 1164.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Crown Powder Detergent (30g)",
+      "message": "Profit = 4.86 \u00d7 97.0 = 471.42",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Knorr /5piece",
+      "message": "Total cost = 21.3 + 0.0 + 0.00 = 21.30",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Knorr /5piece",
+      "message": "Margin = 25.0 - 21.30 = 3.70",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Knorr /5piece",
+      "message": "Revenue = 25.0 \u00d7 5.0 = 125.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Knorr /5piece",
+      "message": "Profit = 3.70 \u00d7 5.0 = 18.50",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: My Kishin / 3 Pieces",
+      "message": "Total cost = 23.44 + 0.0 + 0.00 = 23.44",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: My Kishin / 3 Pieces",
+      "message": "Margin = 27.0 - 23.44 = 3.56",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: My Kishin / 3 Pieces",
+      "message": "Revenue = 27.0 \u00d7 114.0 = 3078.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: My Kishin / 3 Pieces",
+      "message": "Profit = 3.56 \u00d7 114.0 = 405.84",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Small Size Carrot",
+      "message": "Total cost = 43.0 + 0.0 + 0.00 = 43.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Small Size Carrot",
+      "message": "Margin = 29.0 - 43.00 = -14.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Small Size Carrot",
+      "message": "Revenue = 29.0 \u00d7 267.0 = 7743.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Small Size Carrot",
+      "message": "Profit = -14.00 \u00d7 267.0 = -3738.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Wakene 1st Level Flour",
+      "message": "Total cost = 100.0 + 0.0 + 0.00 = 100.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Wakene 1st Level Flour",
+      "message": "Margin = 102.0 - 100.00 = 2.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Wakene 1st Level Flour",
+      "message": "Revenue = 102.0 \u00d7 1193.0 = 121686.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Wakene 1st Level Flour",
+      "message": "Profit = 2.00 \u00d7 1193.0 = 2386.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Green Chili (\u00e1\u02c6\u00b5\u00e1\u2030\u00b3\u00e1\u02c6\u00ad\u00e1\u2030\u00b3)",
+      "message": "Total cost = 125.0 + 0.0 + 0.00 = 125.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Green Chili (\u00e1\u02c6\u00b5\u00e1\u2030\u00b3\u00e1\u02c6\u00ad\u00e1\u2030\u00b3)",
+      "message": "Margin = 135.0 - 125.00 = 10.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Green Chili (\u00e1\u02c6\u00b5\u00e1\u2030\u00b3\u00e1\u02c6\u00ad\u00e1\u2030\u00b3)",
+      "message": "Revenue = 135.0 \u00d7 477.0 = 64395.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Green Chili (\u00e1\u02c6\u00b5\u00e1\u2030\u00b3\u00e1\u02c6\u00ad\u00e1\u2030\u00b3)",
+      "message": "Profit = 10.00 \u00d7 477.0 = 4770.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Red onion ( \u00e1\u02c6\u0192\u00e1\u2030 \u00e1\u02c6\u00bb )",
+      "message": "Total cost = 26.0 + 0.0 + 0.00 = 26.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Red onion ( \u00e1\u02c6\u0192\u00e1\u2030 \u00e1\u02c6\u00bb )",
+      "message": "Margin = 26.0 - 26.00 = 0.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Red onion ( \u00e1\u02c6\u0192\u00e1\u2030 \u00e1\u02c6\u00bb )",
+      "message": "Revenue = 26.0 \u00d7 19155.0 = 498030.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Red onion ( \u00e1\u02c6\u0192\u00e1\u2030 \u00e1\u02c6\u00bb )",
+      "message": "Profit = 0.00 \u00d7 19155.0 = 0.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Potato Grade C",
+      "message": "Total cost = 20.89 + 0.0 + 0.00 = 20.89",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Potato Grade C",
+      "message": "Margin = 9.0 - 20.89 = -11.89",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Potato Grade C",
+      "message": "Revenue = 9.0 \u00d7 1797.0 = 16173.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Potato Grade C",
+      "message": "Profit = -11.89 \u00d7 1797.0 = -21366.33",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Corn Kinche",
+      "message": "Total cost = 57.97 + 0.0 + 0.00 = 57.97",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Corn Kinche",
+      "message": "Margin = 80.0 - 57.97 = 22.03",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Corn Kinche",
+      "message": "Revenue = 80.0 \u00d7 42.0 = 3360.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Corn Kinche",
+      "message": "Profit = 22.03 \u00d7 42.0 = 925.26",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Yummy Crunchy Peanut Butter",
+      "message": "Total cost = 325.0 + 0.0 + 0.00 = 325.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Yummy Crunchy Peanut Butter",
+      "message": "Margin = 304.0 - 325.00 = -21.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Yummy Crunchy Peanut Butter",
+      "message": "Revenue = 304.0 \u00d7 5.0 = 1520.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Yummy Crunchy Peanut Butter",
+      "message": "Profit = -21.00 \u00d7 5.0 = -105.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Cost Formula: Red Onion C",
+      "message": "Total cost = 26.0 + 0.0 + 0.00 = 26.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Margin Formula: Red Onion C",
+      "message": "Margin = 9.0 - 26.00 = -17.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Revenue Formula: Red Onion C",
+      "message": "Revenue = 9.0 \u00d7 623.0 = 5607.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profit Formula: Red Onion C",
+      "message": "Profit = -17.00 \u00d7 623.0 = -10591.00",
+      "details": null
+    },
+    {
+      "test": "Weekly Profitability: Overall",
+      "message": "Total errors: 0, Warnings: 9, Products tested: 311",
+      "details": null
+    }
+  ],
+  "failed": [
+    {
+      "test": "API: /api/products/daily-profitability",
+      "message": "HTTP 404: {\"detail\":\"Not Found\"}",
+      "details": null
+    },
+    {
+      "test": "API: /api/products/daily-profitability",
+      "message": "HTTP 404: {\"detail\":\"Not Found\"}",
+      "details": null
+    },
+    {
+      "test": "API: /api/products/daily-profitability",
+      "message": "HTTP 404: {\"detail\":\"Not Found\"}",
+      "details": null
+    }
+  ],
+  "warnings": [
+    {
+      "test": "Weekly Volume Consistency: My Kishin / 3 Pieces",
+      "message": "Total volume (114.0) != SGL (0.0) + Regular (0.0)",
+      "details": null
+    },
+    {
+      "test": "Weekly Volume Consistency: Small Size Carrot",
+      "message": "Total volume (267.0) != SGL (0.0) + Regular (0.0)",
+      "details": null
+    },
+    {
+      "test": "Weekly Volume Consistency: Wakene 1st Level Flour",
+      "message": "Total volume (1193.0) != SGL (0.0) + Regular (0.0)",
+      "details": null
+    },
+    {
+      "test": "Weekly Volume Consistency: Green Chili (\u00e1\u02c6\u00b5\u00e1\u2030\u00b3\u00e1\u02c6\u00ad\u00e1\u2030\u00b3)",
+      "message": "Total volume (477.0) != SGL (0.0) + Regular (0.0)",
+      "details": null
+    },
+    {
+      "test": "Weekly Volume Consistency: Red onion ( \u00e1\u02c6\u0192\u00e1\u2030 \u00e1\u02c6\u00bb )",
+      "message": "Total volume (19155.0) != SGL (0.0) + Regular (0.0)",
+      "details": null
+    },
+    {
+      "test": "Weekly Volume Consistency: Potato Grade C",
+      "message": "Total volume (1797.0) != SGL (0.0) + Regular (0.0)",
+      "details": null
+    },
+    {
+      "test": "Weekly Volume Consistency: Corn Kinche",
+      "message": "Total volume (42.0) != SGL (0.0) + Regular (0.0)",
+      "details": null
+    },
+    {
+      "test": "Weekly Volume Consistency: Yummy Crunchy Peanut Butter",
+      "message": "Total volume (5.0) != SGL (0.0) + Regular (0.0)",
+      "details": null
+    },
+    {
+      "test": "Weekly Volume Consistency: Red Onion C",
+      "message": "Total volume (623.0) != SGL (0.0) + Regular (0.0)",
+      "details": null
+    }
+  ],
+  "summary": {
+    "weekly_profitability": {
+      "total_products": 311,
+      "errors": 0,
+      "warnings": 9
+    }
+  }
+}

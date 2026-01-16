@@ -18,6 +18,7 @@ import type { ProductProfitability, B2BBusinessOverview, B2BProductProfitAnalysi
 import { LeaderBasketInsights } from './LeaderBasketInsights';
 import { StapleProductGrid } from './StapleProductGrid';
 import { DailyOperationalCosts } from '../OperationalCosts/DailyOperationalCosts';
+import { WeeklyTrendsChart } from './WeeklyTrendsChart';
 
 const STAPLE_PRODUCTS = [
   'Potato',
@@ -342,6 +343,9 @@ export const OverviewPage: React.FC = () => {
           color="orange"
         />
       </div>
+
+      {/* Weekly Trends Chart - Full Width */}
+      <WeeklyTrendsChart />
 
       {/* Profit Margin Card */}
       <div className="bg-white rounded-lg shadow p-6">

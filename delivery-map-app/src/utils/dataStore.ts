@@ -154,24 +154,75 @@ class DataStoreClass {
     return this.productCosts.find(p => p.product_name === productName);
   }
 
+  // Helper to find matching volume data by product name (handles variations)
+  private findVolumeForProduct(productName: string, volumeData: VolumeMap): number {
+    // Try exact match first
+    if (volumeData[productName] !== undefined) {
+      return volumeData[productName];
+    }
+    
+    // Try case-insensitive match
+    const productLower = productName.toLowerCase();
+    for (const [key, value] of Object.entries(volumeData)) {
+      if (key.toLowerCase() === productLower) {
+        return value;
+      }
+    }
+    
+    // Try partial match (e.g., "Red Onion" matches "Red onion ( ሃበሻ )")
+    const productWords = productLower.split(/\s+/).filter(w => w.length > 2);
+    for (const [key, value] of Object.entries(volumeData)) {
+      const keyLower = key.toLowerCase();
+      // Check if all significant words from product name are in the key
+      if (productWords.length > 0 && productWords.every(word => keyLower.includes(word))) {
+        return value;
+      }
+      // Also check reverse (key words in product name)
+      const keyWords = keyLower.split(/\s+/).filter(w => w.length > 2);
+      if (keyWords.length > 0 && keyWords.every(word => productLower.includes(word))) {
+        return value;
+      }
+    }
+    
+    return 0;
+  }
+
   getProductProfitability(
     volumeData: VolumeMap = this.weeklyTotalVolumeMap,
     localShopPrices: PriceMap = this.localShopPriceMap,
     filters?: ProfitabilityFilters,
     includeOperationalCost: boolean = true
   ): ProductProfitability[] {
+    // CRITICAL FIX: Only iterate over products that are in productMetrics (from API)
+    // This ensures we only show products that actually have sales in the last 7 days
+    // Build a set of product names from productMetrics for fast lookup
+    const productsWithSales = new Set(
+      this.productMetrics.map(m => m.product_name)
+    );
+    
+    // Only process products that are in both productCosts AND productMetrics
     const results = this.productCosts
+      .filter(product => {
+        // Only include products that have sales in the last 7 days (from API)
+        return productsWithSales.has(product.product_name);
+      })
       .map(product => {
         const productName = product.product_name;
-        const totalVolume = volumeData[productName] ?? 0;
-        const sglVolume = this.weeklySglVolumeMap[productName] ?? 0;
+        const totalVolume = this.findVolumeForProduct(productName, volumeData);
+        const sglVolume = this.findVolumeForProduct(productName, this.weeklySglVolumeMap);
         const regularVolume =
-          this.weeklyRegularVolumeMap[productName] ??
+          this.findVolumeForProduct(productName, this.weeklyRegularVolumeMap) ||
           Math.max(totalVolume - sglVolume, 0);
         const localPrice =
           localShopPrices[productName] ?? product.selling_price * 1.5;
 
         const groupType = filters?.groupType ?? 'all';
+
+        // CRITICAL FIX: Only show products that have sales in the last 7 days
+        // Filter out products with zero volume to ensure we only show active products
+        if (totalVolume <= 0) {
+          return null;
+        }
 
         if (groupType === 'regular') {
           if (regularVolume <= 0) {
@@ -197,7 +248,11 @@ class DataStoreClass {
           });
         }
 
-        // Mixed view (default)
+        // Mixed view (default) - only include if total volume > 0
+        if (totalVolume <= 0) {
+          return null;
+        }
+        
         return calculateProfitability(product, totalVolume, localPrice, {
           sglVolume,
           regularVolume,

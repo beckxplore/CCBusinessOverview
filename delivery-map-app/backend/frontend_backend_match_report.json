@@ -1,0 +1,113 @@
+{
+  "timestamp": "2025-12-01T17:08:08.845396",
+  "window": {
+    "start": "2025-11-24",
+    "end": "2025-11-30"
+  },
+  "total_products": 80,
+  "total_volume_kg": 93763.0,
+  "total_revenue_etb": 3236518.5,
+  "zero_volume_count": 0,
+  "top_products": [
+    {
+      "name": "Red onion ( \u00e1\u02c6\u0192\u00e1\u2030 \u00e1\u02c6\u00bb )",
+      "volume_kg": 19155.0,
+      "revenue_etb": 511153.0
+    },
+    {
+      "name": "Red onion ( \u1203\u1260\u123b )",
+      "volume_kg": 18725.0,
+      "revenue_etb": 497407.0
+    },
+    {
+      "name": "Potato",
+      "volume_kg": 11702.0,
+      "revenue_etb": 295002.0
+    },
+    {
+      "name": "Tomato",
+      "volume_kg": 7367.0,
+      "revenue_etb": 327793.0
+    },
+    {
+      "name": "White cabbage",
+      "volume_kg": 6583.0,
+      "revenue_etb": 135389.0
+    },
+    {
+      "name": "Beetroot",
+      "volume_kg": 3284.0,
+      "revenue_etb": 95027.0
+    },
+    {
+      "name": "Carrot",
+      "volume_kg": 3101.0,
+      "revenue_etb": 155709.0
+    },
+    {
+      "name": "Avocado",
+      "volume_kg": 2465.0,
+      "revenue_etb": 224102.0
+    },
+    {
+      "name": "Sweet Potato",
+      "volume_kg": 2366.0,
+      "revenue_etb": 72111.0
+    },
+    {
+      "name": "Small Red Onion",
+      "volume_kg": 1894.0,
+      "revenue_etb": 29548.0
+    },
+    {
+      "name": "Potato Grade C",
+      "volume_kg": 1797.0,
+      "revenue_etb": 16173.0
+    },
+    {
+      "name": "Garlic",
+      "volume_kg": 1647.0,
+      "revenue_etb": 111564.0
+    },
+    {
+      "name": "Ginger",
+      "volume_kg": 1411.0,
+      "revenue_etb": 48007.0
+    },
+    {
+      "name": "Wakene 1st Level Flour",
+      "volume_kg": 1193.0,
+      "revenue_etb": 124010.0
+    },
+    {
+      "name": "Red Onion Elfora",
+      "volume_kg": 1190.0,
+      "revenue_etb": 27846.0
+    },
+    {
+      "name": "Banana/ Raw",
+      "volume_kg": 788.0,
+      "revenue_etb": 32642.0
+    },
+    {
+      "name": "Small Size Potato",
+      "volume_kg": 750.0,
+      "revenue_etb": 12000.0
+    },
+    {
+      "name": "Green Beans",
+      "volume_kg": 644.0,
+      "revenue_etb": 17277.0
+    },
+    {
+      "name": "Red Onion C",
+      "volume_kg": 623.0,
+      "revenue_etb": 5607.0
+    },
+    {
+      "name": "Papaya",
+      "volume_kg": 536.0,
+      "revenue_etb": 37274.0
+    }
+  ]
+}

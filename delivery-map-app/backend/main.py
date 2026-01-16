@@ -1196,6 +1196,7 @@ def load_daily_operational_costs_data() -> list[dict[str, Any]]:
                 continue
             
             # Check if this is a known cost category row by row number
+            # Only use exact row numbers: Row 51 (warehouse), Row 58 (fulfilment), Row 71 (last_mile)
             category_type = None
             category_name = None
             
@@ -1205,13 +1206,8 @@ def load_daily_operational_costs_data() -> list[dict[str, Any]]:
                 category_name = day_value.title()
                 logger.debug(f"Found {category_type} costs at row {row_index_in_array + 1} (index {row_index_in_array})")
             else:
-                # Fallback: Check if this row matches any cost category by keywords
-                for cat_type, keywords in cost_categories.items():
-                    if any(keyword in day_value for keyword in keywords):
-                        category_type = cat_type
-                        category_name = day_value.title()
-                        logger.debug(f"Found {category_type} costs by keyword matching at row {row_index_in_array + 1}")
-                        break
+                # Skip this row - only use exact row numbers to avoid matching B2C/B2B last mile costs
+                continue
             
             if not category_type:
                 continue
@@ -2503,6 +2499,145 @@ def get_latest_operational_costs():
         "date": latest_date_str
     }
 
+@app.get("/api/trends/weekly")
+def get_weekly_trends(
+    weeks: int = Query(8, description="Number of weeks to return", ge=1, le=26)
+):
+    """Get weekly trends for purchase cost, revenue, and operational cost.
+    
+    Returns weekly aggregated data for the last N weeks.
+    """
+    from datetime import datetime, date as date_type, timedelta
+    import pandas as pd
+    
+    # Minimum date: 10/13/2025
+    MIN_DATE = date_type(2025, 10, 13)
+    
+    # Get daily operational costs
+    daily_costs_raw = load_daily_operational_costs_data()
+    
+    # Get daily volumes from Google Sheet
+    df = fetch_raw_sheet_data()
+    if df is None or df.empty:
+        return {
+            "weekly_trends": [],
+            "count": 0,
+            "error": "No volume data available"
+        }
+    
+    # Filter by minimum date
+    if 'date_dt' in df.columns:
+        df['date'] = df['date_dt'].dt.date
+        df = df[df['date'] >= MIN_DATE]
+    else:
+        return {
+            "weekly_trends": [],
+            "count": 0,
+            "error": "Date column not found in volume data"
+        }
+    
+    # Group volumes by date
+    daily_volumes = df.groupby('date').agg({
+        'final_volume_kg': 'sum',
+        'final_revenue': 'sum',
+        'final_cost': 'sum'
+    }).reset_index()
+    
+    # Group operational costs by date
+    costs_by_date: dict[str, dict[str, float]] = {}
+    for cost in daily_costs_raw:
+        cost_date_str = cost["date"]
+        cost_date = datetime.fromisoformat(cost_date_str).date()
+        
+        if cost_date < MIN_DATE:
+            continue
+        
+        if cost_date_str not in costs_by_date:
+            costs_by_date[cost_date_str] = {
+                "warehouse": 0.0,
+                "fulfilment": 0.0,
+                "last_mile": 0.0
+            }
+        
+        category = cost["category"]
+        if category in costs_by_date[cost_date_str]:
+            costs_by_date[cost_date_str][category] = cost["cost_per_kg"]
+    
+    # Calculate daily data with operational costs
+    daily_data = []
+    for _, row in daily_volumes.iterrows():
+        day_date = row['date']
+        day_date_str = day_date.isoformat() if isinstance(day_date, date_type) else str(day_date)
+        
+        volume_kg = float(row['final_volume_kg'])
+        revenue = float(row['final_revenue'])
+        procurement_cost = float(row['final_cost'])
+        
+        # Get operational costs for this day
+        day_costs = costs_by_date.get(day_date_str, {
+            "warehouse": 0.0,
+            "fulfilment": 0.0,
+            "last_mile": 0.0
+        })
+        
+        total_ops_cost_per_kg = (
+            day_costs["warehouse"] + 
+            day_costs["fulfilment"] + 
+            day_costs["last_mile"]
+        )
+        total_ops_cost = total_ops_cost_per_kg * volume_kg if volume_kg > 0 else 0.0
+        
+        daily_data.append({
+            "date": day_date,
+            "revenue": revenue,
+            "purchase_cost": procurement_cost,
+            "operational_cost": total_ops_cost
+        })
+    
+    # Convert to DataFrame for easier grouping
+    df_daily = pd.DataFrame(daily_data)
+    if df_daily.empty:
+        return {
+            "weekly_trends": [],
+            "count": 0
+        }
+    
+    # Group by week (Monday to Sunday)
+    df_daily['week_start'] = pd.to_datetime(df_daily['date']) - pd.to_timedelta(
+        pd.to_datetime(df_daily['date']).dt.dayofweek, unit='d'
+    )
+    
+    # Aggregate by week
+    weekly_data = df_daily.groupby('week_start').agg({
+        'revenue': 'sum',
+        'purchase_cost': 'sum',
+        'operational_cost': 'sum'
+    }).reset_index()
+    
+    # Sort by week_start descending and take last N weeks
+    weekly_data = weekly_data.sort_values('week_start', ascending=False).head(weeks)
+    weekly_data = weekly_data.sort_values('week_start', ascending=True)  # Sort ascending for display
+    
+    # Format response
+    weekly_trends = []
+    for _, row in weekly_data.iterrows():
+        week_start = row['week_start'].date()
+        week_end = week_start + timedelta(days=6)
+        
+        weekly_trends.append({
+            "week_start": week_start.isoformat(),
+            "week_end": week_end.isoformat(),
+            "week_label": f"{week_start.strftime('%b %d')} - {week_end.strftime('%b %d')}",
+            "revenue": float(row['revenue']),
+            "purchase_cost": float(row['purchase_cost']),
+            "operational_cost": float(row['operational_cost'])
+        })
+    
+    return {
+        "weekly_trends": weekly_trends,
+        "count": len(weekly_trends)
+    }
+
 @app.get("/api/costs/tiers")
 def get_sgl_tiers():
     """Return SGL tier definitions from SGL_TIERS.csv."""
@@ -3196,6 +3331,124 @@ async def get_b2b_payment_behavior(
         "note": "This feature requires additional customer payment data that is not provided by the current MCP.",
         "period": format_date_range(date_from, date_to)
     }
+
+# ========== Price Forecasting Endpoints ==========
+
+@app.get("/api/forecast/price")
+def get_price_forecast(
+    product_name: str = Query(..., description="Product name"),
+    current_price: float = Query(..., description="Current market price in ETB"),
+    current_date: Optional[str] = Query(None, description="Current date (YYYY-MM-DD), defaults to today"),
+    forecast_horizon_days: int = Query(30, description="Days ahead to forecast", ge=1, le=90),
+    include_adjustments: bool = Query(True, description="Include market-specific adjustments")
+):
+    """
+    Get price forecast for a product.
+    
+    Combines:
+    - 15-year seasonality data (base forecast)
+    - Market-specific adjustments (holidays, paydays, supply)
+    - Confidence intervals
+    - Recommendations
+    
+    Returns comprehensive forecast with base prediction, adjustments, and risk indicators.
+    """
+    try:
+        from services.forecast_api import get_price_forecast as forecast_func
+        from datetime import date as date_type
+        
+        # Parse date
+        if current_date:
+            try:
+                forecast_date = datetime.strptime(current_date, "%Y-%m-%d").date()
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+        else:
+            forecast_date = date_type.today()
+        
+        # Get forecast
+        result = forecast_func(
+            product_name=product_name,
+            current_price=current_price,
+            current_date=forecast_date,
+            forecast_horizon_days=forecast_horizon_days,
+            include_adjustments=include_adjustments
+        )
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating price forecast: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate forecast: {str(e)}")
+
+
+@app.get("/api/forecast/price/features")
+def get_price_forecast_features(
+    product_name: str = Query(..., description="Product name"),
+    current_price: float = Query(..., description="Current market price in ETB"),
+    current_date: Optional[str] = Query(None, description="Current date (YYYY-MM-DD), defaults to today")
+):
+    """
+    Get all features used for price forecasting.
+    
+    Useful for debugging and understanding what factors influence the forecast.
+    Returns all 93+ features extracted for the given product/date/price.
+    """
+    try:
+        from services.feature_engineering import extract_features_for_forecast
+        from services.data_preparation import prepare_training_data, load_benchmark_prices
+        from datetime import date as date_type
+        
+        # Parse date
+        if current_date:
+            try:
+                forecast_date = datetime.strptime(current_date, "%Y-%m-%d").date()
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+        else:
+            forecast_date = date_type.today()
+        
+        # Prepare data
+        price_history, volume_history, metrics = prepare_training_data(
+            product_name=product_name,
+            forecast_date=forecast_date,
+            lookback_days=365
+        )
+        
+        # Load benchmark prices
+        benchmark_prices = load_benchmark_prices(product_name, forecast_date)
+        
+        # Extract features
+        features = extract_features_for_forecast(
+            product_name=product_name,
+            current_date=forecast_date,
+            current_price=current_price,
+            price_history=price_history if len(price_history) > 0 else None,
+            volume_history=volume_history if len(volume_history) > 0 else None,
+            benchmark_prices=benchmark_prices if benchmark_prices else None
+        )
+        
+        return {
+            'product': product_name,
+            'current_price': current_price,
+            'current_date': forecast_date.isoformat(),
+            'features': features,
+            'feature_count': len(features),
+            'data_available': {
+                'price_history': len(price_history) > 0,
+                'volume_history': len(volume_history) > 0,
+                'benchmark_prices': len(benchmark_prices) > 0
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error extracting features: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to extract features: {str(e)}")
+
 
 # Serve static files from frontend build directory (for Docker deployment)
 # This must be added after all API routes

@@ -1,0 +1,776 @@
+{
+  "ethiopian_paydays": [
+    "2024-11-08",
+    "2024-12-08",
+    "2025-01-08",
+    "2025-02-08",
+    "2025-03-08",
+    "2025-04-08",
+    "2025-05-08",
+    "2025-06-08",
+    "2025-07-08",
+    "2025-08-08",
+    "2025-09-08",
+    "2025-10-08",
+    "2025-11-08",
+    "2025-12-08",
+    "2026-01-08",
+    "2026-02-08",
+    "2026-03-08",
+    "2026-04-08",
+    "2026-05-08",
+    "2026-06-08",
+    "2026-07-08",
+    "2026-08-08",
+    "2026-09-08",
+    "2026-10-08",
+    "2026-11-08",
+    "2026-12-08",
+    "2027-01-08",
+    "2027-02-08",
+    "2027-03-08",
+    "2027-04-08",
+    "2027-05-08",
+    "2027-06-08",
+    "2027-07-08",
+    "2027-08-08",
+    "2027-09-08",
+    "2027-10-08",
+    "2027-11-08",
+    "2027-12-08"
+  ],
+  "western_paydays": [
+    "2024-11-28",
+    "2024-12-28",
+    "2025-01-28",
+    "2025-02-28",
+    "2025-03-28",
+    "2025-04-28",
+    "2025-05-28",
+    "2025-06-28",
+    "2025-07-28",
+    "2025-08-28",
+    "2025-09-28",
+    "2025-10-28",
+    "2025-11-28",
+    "2025-12-28",
+    "2026-01-28",
+    "2026-02-28",
+    "2026-03-28",
+    "2026-04-28",
+    "2026-05-28",
+    "2026-06-28",
+    "2026-07-28",
+    "2026-08-28",
+    "2026-09-28",
+    "2026-10-28",
+    "2026-11-28",
+    "2026-12-28",
+    "2027-01-28",
+    "2027-02-28",
+    "2027-03-28",
+    "2027-04-28",
+    "2027-05-28",
+    "2027-06-28",
+    "2027-07-28",
+    "2027-08-28",
+    "2027-09-28",
+    "2027-10-28",
+    "2027-11-28",
+    "2027-12-28"
+  ],
+  "all_paydays": [
+    "2024-11-08",
+    "2024-11-28",
+    "2024-12-08",
+    "2024-12-28",
+    "2025-01-08",
+    "2025-01-28",
+    "2025-02-08",
+    "2025-02-28",
+    "2025-03-08",
+    "2025-03-28",
+    "2025-04-08",
+    "2025-04-28",
+    "2025-05-08",
+    "2025-05-28",
+    "2025-06-08",
+    "2025-06-28",
+    "2025-07-08",
+    "2025-07-28",
+    "2025-08-08",
+    "2025-08-28",
+    "2025-09-08",
+    "2025-09-28",
+    "2025-10-08",
+    "2025-10-28",
+    "2025-11-08",
+    "2025-11-28",
+    "2025-12-08",
+    "2025-12-28",
+    "2026-01-08",
+    "2026-01-28",
+    "2026-02-08",
+    "2026-02-28",
+    "2026-03-08",
+    "2026-03-28",
+    "2026-04-08",
+    "2026-04-28",
+    "2026-05-08",
+    "2026-05-28",
+    "2026-06-08",
+    "2026-06-28",
+    "2026-07-08",
+    "2026-07-28",
+    "2026-08-08",
+    "2026-08-28",
+    "2026-09-08",
+    "2026-09-28",
+    "2026-10-08",
+    "2026-10-28",
+    "2026-11-08",
+    "2026-11-28",
+    "2026-12-08",
+    "2026-12-28",
+    "2027-01-08",
+    "2027-01-28",
+    "2027-02-08",
+    "2027-02-28",
+    "2027-03-08",
+    "2027-03-28",
+    "2027-04-08",
+    "2027-04-28",
+    "2027-05-08",
+    "2027-05-28",
+    "2027-06-08",
+    "2027-06-28",
+    "2027-07-08",
+    "2027-07-28",
+    "2027-08-08",
+    "2027-08-28",
+    "2027-09-08",
+    "2027-09-28",
+    "2027-10-08",
+    "2027-10-28",
+    "2027-11-08",
+    "2027-11-28",
+    "2027-12-08",
+    "2027-12-28"
+  ],
+  "payday_details": [
+    {
+      "date": "2024-11-08",
+      "type": "ethiopian",
+      "gregorian_month": 11,
+      "gregorian_day": 8,
+      "ethiopian_month": 2,
+      "ethiopian_month_name": "Tikimt",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2024-11-28",
+      "type": "western",
+      "gregorian_month": 11,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2024-12-08",
+      "type": "ethiopian",
+      "gregorian_month": 12,
+      "gregorian_day": 8,
+      "ethiopian_month": 3,
+      "ethiopian_month_name": "Hidar",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2024-12-28",
+      "type": "western",
+      "gregorian_month": 12,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-01-08",
+      "type": "ethiopian",
+      "gregorian_month": 1,
+      "gregorian_day": 8,
+      "ethiopian_month": 4,
+      "ethiopian_month_name": "Tahsas",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 30
+    },
+    {
+      "date": "2025-01-28",
+      "type": "western",
+      "gregorian_month": 1,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-02-08",
+      "type": "ethiopian",
+      "gregorian_month": 2,
+      "gregorian_day": 8,
+      "ethiopian_month": 6,
+      "ethiopian_month_name": "Yekatit",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 1
+    },
+    {
+      "date": "2025-02-28",
+      "type": "western",
+      "gregorian_month": 2,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-03-08",
+      "type": "ethiopian",
+      "gregorian_month": 3,
+      "gregorian_day": 8,
+      "ethiopian_month": 6,
+      "ethiopian_month_name": "Yekatit",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2025-03-28",
+      "type": "western",
+      "gregorian_month": 3,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-04-08",
+      "type": "ethiopian",
+      "gregorian_month": 4,
+      "gregorian_day": 8,
+      "ethiopian_month": 7,
+      "ethiopian_month_name": "Megabit",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 30
+    },
+    {
+      "date": "2025-04-28",
+      "type": "western",
+      "gregorian_month": 4,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-05-08",
+      "type": "ethiopian",
+      "gregorian_month": 5,
+      "gregorian_day": 8,
+      "ethiopian_month": 8,
+      "ethiopian_month_name": "Miazia",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 30
+    },
+    {
+      "date": "2025-05-28",
+      "type": "western",
+      "gregorian_month": 5,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-06-08",
+      "type": "ethiopian",
+      "gregorian_month": 6,
+      "gregorian_day": 8,
+      "ethiopian_month": 10,
+      "ethiopian_month_name": "Sene",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 1
+    },
+    {
+      "date": "2025-06-28",
+      "type": "western",
+      "gregorian_month": 6,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-07-08",
+      "type": "ethiopian",
+      "gregorian_month": 7,
+      "gregorian_day": 8,
+      "ethiopian_month": 11,
+      "ethiopian_month_name": "Hamle",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 1
+    },
+    {
+      "date": "2025-07-28",
+      "type": "western",
+      "gregorian_month": 7,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-08-08",
+      "type": "ethiopian",
+      "gregorian_month": 8,
+      "gregorian_day": 8,
+      "ethiopian_month": 12,
+      "ethiopian_month_name": "Nehase",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 2
+    },
+    {
+      "date": "2025-08-28",
+      "type": "western",
+      "gregorian_month": 8,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-09-08",
+      "type": "ethiopian",
+      "gregorian_month": 9,
+      "gregorian_day": 8,
+      "ethiopian_month": 13,
+      "ethiopian_month_name": "Pagume",
+      "ethiopian_year": 2017,
+      "ethiopian_day": 3
+    },
+    {
+      "date": "2025-09-28",
+      "type": "western",
+      "gregorian_month": 9,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-10-08",
+      "type": "ethiopian",
+      "gregorian_month": 10,
+      "gregorian_day": 8,
+      "ethiopian_month": 1,
+      "ethiopian_month_name": "Meskerem",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 28
+    },
+    {
+      "date": "2025-10-28",
+      "type": "western",
+      "gregorian_month": 10,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-11-08",
+      "type": "ethiopian",
+      "gregorian_month": 11,
+      "gregorian_day": 8,
+      "ethiopian_month": 2,
+      "ethiopian_month_name": "Tikimt",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2025-11-28",
+      "type": "western",
+      "gregorian_month": 11,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2025-12-08",
+      "type": "ethiopian",
+      "gregorian_month": 12,
+      "gregorian_day": 8,
+      "ethiopian_month": 3,
+      "ethiopian_month_name": "Hidar",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2025-12-28",
+      "type": "western",
+      "gregorian_month": 12,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-01-08",
+      "type": "ethiopian",
+      "gregorian_month": 1,
+      "gregorian_day": 8,
+      "ethiopian_month": 4,
+      "ethiopian_month_name": "Tahsas",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 30
+    },
+    {
+      "date": "2026-01-28",
+      "type": "western",
+      "gregorian_month": 1,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-02-08",
+      "type": "ethiopian",
+      "gregorian_month": 2,
+      "gregorian_day": 8,
+      "ethiopian_month": 6,
+      "ethiopian_month_name": "Yekatit",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 1
+    },
+    {
+      "date": "2026-02-28",
+      "type": "western",
+      "gregorian_month": 2,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-03-08",
+      "type": "ethiopian",
+      "gregorian_month": 3,
+      "gregorian_day": 8,
+      "ethiopian_month": 6,
+      "ethiopian_month_name": "Yekatit",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2026-03-28",
+      "type": "western",
+      "gregorian_month": 3,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-04-08",
+      "type": "ethiopian",
+      "gregorian_month": 4,
+      "gregorian_day": 8,
+      "ethiopian_month": 7,
+      "ethiopian_month_name": "Megabit",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 30
+    },
+    {
+      "date": "2026-04-28",
+      "type": "western",
+      "gregorian_month": 4,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-05-08",
+      "type": "ethiopian",
+      "gregorian_month": 5,
+      "gregorian_day": 8,
+      "ethiopian_month": 8,
+      "ethiopian_month_name": "Miazia",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 30
+    },
+    {
+      "date": "2026-05-28",
+      "type": "western",
+      "gregorian_month": 5,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-06-08",
+      "type": "ethiopian",
+      "gregorian_month": 6,
+      "gregorian_day": 8,
+      "ethiopian_month": 10,
+      "ethiopian_month_name": "Sene",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 1
+    },
+    {
+      "date": "2026-06-28",
+      "type": "western",
+      "gregorian_month": 6,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-07-08",
+      "type": "ethiopian",
+      "gregorian_month": 7,
+      "gregorian_day": 8,
+      "ethiopian_month": 11,
+      "ethiopian_month_name": "Hamle",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 1
+    },
+    {
+      "date": "2026-07-28",
+      "type": "western",
+      "gregorian_month": 7,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-08-08",
+      "type": "ethiopian",
+      "gregorian_month": 8,
+      "gregorian_day": 8,
+      "ethiopian_month": 12,
+      "ethiopian_month_name": "Nehase",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 2
+    },
+    {
+      "date": "2026-08-28",
+      "type": "western",
+      "gregorian_month": 8,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-09-08",
+      "type": "ethiopian",
+      "gregorian_month": 9,
+      "gregorian_day": 8,
+      "ethiopian_month": 13,
+      "ethiopian_month_name": "Pagume",
+      "ethiopian_year": 2018,
+      "ethiopian_day": 3
+    },
+    {
+      "date": "2026-09-28",
+      "type": "western",
+      "gregorian_month": 9,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-10-08",
+      "type": "ethiopian",
+      "gregorian_month": 10,
+      "gregorian_day": 8,
+      "ethiopian_month": 1,
+      "ethiopian_month_name": "Meskerem",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 28
+    },
+    {
+      "date": "2026-10-28",
+      "type": "western",
+      "gregorian_month": 10,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-11-08",
+      "type": "ethiopian",
+      "gregorian_month": 11,
+      "gregorian_day": 8,
+      "ethiopian_month": 2,
+      "ethiopian_month_name": "Tikimt",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2026-11-28",
+      "type": "western",
+      "gregorian_month": 11,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2026-12-08",
+      "type": "ethiopian",
+      "gregorian_month": 12,
+      "gregorian_day": 8,
+      "ethiopian_month": 3,
+      "ethiopian_month_name": "Hidar",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2026-12-28",
+      "type": "western",
+      "gregorian_month": 12,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-01-08",
+      "type": "ethiopian",
+      "gregorian_month": 1,
+      "gregorian_day": 8,
+      "ethiopian_month": 4,
+      "ethiopian_month_name": "Tahsas",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 30
+    },
+    {
+      "date": "2027-01-28",
+      "type": "western",
+      "gregorian_month": 1,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-02-08",
+      "type": "ethiopian",
+      "gregorian_month": 2,
+      "gregorian_day": 8,
+      "ethiopian_month": 6,
+      "ethiopian_month_name": "Yekatit",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 1
+    },
+    {
+      "date": "2027-02-28",
+      "type": "western",
+      "gregorian_month": 2,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-03-08",
+      "type": "ethiopian",
+      "gregorian_month": 3,
+      "gregorian_day": 8,
+      "ethiopian_month": 6,
+      "ethiopian_month_name": "Yekatit",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2027-03-28",
+      "type": "western",
+      "gregorian_month": 3,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-04-08",
+      "type": "ethiopian",
+      "gregorian_month": 4,
+      "gregorian_day": 8,
+      "ethiopian_month": 7,
+      "ethiopian_month_name": "Megabit",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 30
+    },
+    {
+      "date": "2027-04-28",
+      "type": "western",
+      "gregorian_month": 4,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-05-08",
+      "type": "ethiopian",
+      "gregorian_month": 5,
+      "gregorian_day": 8,
+      "ethiopian_month": 8,
+      "ethiopian_month_name": "Miazia",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 30
+    },
+    {
+      "date": "2027-05-28",
+      "type": "western",
+      "gregorian_month": 5,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-06-08",
+      "type": "ethiopian",
+      "gregorian_month": 6,
+      "gregorian_day": 8,
+      "ethiopian_month": 10,
+      "ethiopian_month_name": "Sene",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 1
+    },
+    {
+      "date": "2027-06-28",
+      "type": "western",
+      "gregorian_month": 6,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-07-08",
+      "type": "ethiopian",
+      "gregorian_month": 7,
+      "gregorian_day": 8,
+      "ethiopian_month": 11,
+      "ethiopian_month_name": "Hamle",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 1
+    },
+    {
+      "date": "2027-07-28",
+      "type": "western",
+      "gregorian_month": 7,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-08-08",
+      "type": "ethiopian",
+      "gregorian_month": 8,
+      "gregorian_day": 8,
+      "ethiopian_month": 12,
+      "ethiopian_month_name": "Nehase",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 2
+    },
+    {
+      "date": "2027-08-28",
+      "type": "western",
+      "gregorian_month": 8,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-09-08",
+      "type": "ethiopian",
+      "gregorian_month": 9,
+      "gregorian_day": 8,
+      "ethiopian_month": 13,
+      "ethiopian_month_name": "Pagume",
+      "ethiopian_year": 2019,
+      "ethiopian_day": 3
+    },
+    {
+      "date": "2027-09-28",
+      "type": "western",
+      "gregorian_month": 9,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-10-08",
+      "type": "ethiopian",
+      "gregorian_month": 10,
+      "gregorian_day": 8,
+      "ethiopian_month": 1,
+      "ethiopian_month_name": "Meskerem",
+      "ethiopian_year": 2020,
+      "ethiopian_day": 28
+    },
+    {
+      "date": "2027-10-28",
+      "type": "western",
+      "gregorian_month": 10,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-11-08",
+      "type": "ethiopian",
+      "gregorian_month": 11,
+      "gregorian_day": 8,
+      "ethiopian_month": 2,
+      "ethiopian_month_name": "Tikimt",
+      "ethiopian_year": 2020,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2027-11-28",
+      "type": "western",
+      "gregorian_month": 11,
+      "gregorian_day": 28
+    },
+    {
+      "date": "2027-12-08",
+      "type": "ethiopian",
+      "gregorian_month": 12,
+      "gregorian_day": 8,
+      "ethiopian_month": 3,
+      "ethiopian_month_name": "Hidar",
+      "ethiopian_year": 2020,
+      "ethiopian_day": 29
+    },
+    {
+      "date": "2027-12-28",
+      "type": "western",
+      "gregorian_month": 12,
+      "gregorian_day": 28
+    }
+  ],
+  "date_range": {
+    "start": "2024-11-02",
+    "end": "2027-12-31"
+  },
+  "ethiopian_pattern": "7th-10th of each Gregorian month (using 8th)",
+  "western_pattern": "27th-31st of each Gregorian month (using 28th)"
+}

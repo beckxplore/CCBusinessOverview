@@ -323,6 +323,21 @@ export interface DailyOperationalCostsResponse {
   } | null;
 }
 
+export interface WeeklyTrend {
+  week_start: string;
+  week_end: string;
+  week_label: string;
+  revenue: number;
+  purchase_cost: number;
+  operational_cost: number;
+}
+
+export interface WeeklyTrendsResponse {
+  weekly_trends: WeeklyTrend[];
+  count: number;
+  error?: string;
+}
+
 export interface DailyRealMargin {
   date: string;
   volume_kg: number;
@@ -339,6 +354,33 @@ export interface DailyRealMargin {
   total_cost_etb: number;
   margin_etb: number;
   margin_pct: number;
+}
+
+export interface DailyProductProfitability {
+  date: string;
+  product_name: string;
+  total_volume_kg: number;
+  volume_normal_group_kg: number;
+  volume_super_group_kg: number;
+  selling_price_per_kg: number;
+  purchase_price_per_kg: number;
+  total_revenue_etb: number;
+  total_purchase_cost_etb: number;
+  super_group_commission_etb: number;
+  commission_rate_per_kg: number;
+  total_cost_etb: number;
+  profit_etb: number;
+  profit_margin_pct: number;
+}
+
+export interface DailyProductProfitabilityResponse {
+  daily_products: DailyProductProfitability[];
+  count: number;
+  date_range?: {
+    from: string | null;
+    to: string | null;
+  };
+  message?: string;
 }
 
 export interface DailyRealMarginsResponse {

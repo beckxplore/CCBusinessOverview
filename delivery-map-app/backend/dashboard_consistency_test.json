@@ -1,0 +1,113 @@
+{
+  "test_date": "2025-12-01T17:06:17.534325",
+  "window": {
+    "start": "2025-11-24",
+    "end": "2025-11-30"
+  },
+  "metrics_count": 80,
+  "all_products_count": 311,
+  "zero_volume_count": 0,
+  "zero_volume_products": [],
+  "sample_products": [
+    {
+      "name": "AMG Coffee (Grinded)",
+      "volume_kg": 5.0,
+      "revenue_etb": 350.0
+    },
+    {
+      "name": "Aja Kinche",
+      "volume_kg": 383.0,
+      "revenue_etb": 72770.0
+    },
+    {
+      "name": "Apple",
+      "volume_kg": 21.0,
+      "revenue_etb": 9450.0
+    },
+    {
+      "name": "Ater Kik",
+      "volume_kg": 147.0,
+      "revenue_etb": 24990.0
+    },
+    {
+      "name": "Avocado",
+      "volume_kg": 2465.0,
+      "revenue_etb": 224102.0
+    },
+    {
+      "name": "Banana/ Raw",
+      "volume_kg": 788.0,
+      "revenue_etb": 32642.0
+    },
+    {
+      "name": "Beetroot",
+      "volume_kg": 3284.0,
+      "revenue_etb": 95027.0
+    },
+    {
+      "name": "Beka ButterCups Fasting Biscut",
+      "volume_kg": 60.0,
+      "revenue_etb": 1020.0
+    },
+    {
+      "name": "Black Lion Tea (80g)",
+      "volume_kg": 438.0,
+      "revenue_etb": 11388.0
+    },
+    {
+      "name": "Bravo Table Tissue",
+      "volume_kg": 57.0,
+      "revenue_etb": 3534.0
+    },
+    {
+      "name": "Bravo Toilet Paper",
+      "volume_kg": 67.0,
+      "revenue_etb": 3953.0
+    },
+    {
+      "name": "Butter",
+      "volume_kg": 15.0,
+      "revenue_etb": 10485.0
+    },
+    {
+      "name": "CK Laundry Soap",
+      "volume_kg": 15.0,
+      "revenue_etb": 900.0
+    },
+    {
+      "name": "CK Powdered Soap (40g)",
+      "volume_kg": 32.0,
+      "revenue_etb": 576.0
+    },
+    {
+      "name": "Carrot",
+      "volume_kg": 3101.0,
+      "revenue_etb": 155709.0
+    },
+    {
+      "name": "Cloud Window Cleaner",
+      "volume_kg": 1.0,
+      "revenue_etb": 90.0
+    },
+    {
+      "name": "Coffee Latte Cream Biscuit",
+      "volume_kg": 5.0,
+      "revenue_etb": 65.0
+    },
+    {
+      "name": "Corn Kinche",
+      "volume_kg": 42.0,
+      "revenue_etb": 3335.0
+    },
+    {
+      "name": "Corn Starch",
+      "volume_kg": 47.0,
+      "revenue_etb": 2820.0
+    },
+    {
+      "name": "Crown Powder Detergent (180gm)",
+      "volume_kg": 51.0,
+      "revenue_etb": 2499.0
+    }
+  ]
+}

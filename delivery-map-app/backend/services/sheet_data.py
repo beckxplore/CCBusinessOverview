@@ -198,6 +198,22 @@ def fetch_sheet_metrics() -> Optional[Dict[str, Any]]:
             product_name = str(row['Product Name']).strip()
             if not product_name:
                 continue
+            
+            # Fix encoding issues (import from main if available, otherwise inline fix)
+            # Known encoding fixes: garbled_text -> correct_text
+            encoding_fixes = {
+                "áˆƒá‰ áˆ»": "ሃበሻ",
+                " áˆƒá‰ áˆ» ": "ሃበሻ",
+                "( áˆƒá‰ áˆ» )": "(ሃበሻ)",
+                "áˆƒá‰áˆ»": "ሃበሻ",
+                "áˆµá‰³áˆá‰³": "ስታርታ",
+                "áˆµá‰³áˆ­á‰³": "ስታርታ",
+                "(áˆµá‰³áˆá‰³)": "(ስታርታ)",
+                "(áˆµá‰³áˆ­á‰³)": "(ስታርታ)",
+            }
+            for garbled, correct in encoding_fixes.items():
+                if garbled in product_name:
+                    product_name = product_name.replace(garbled, correct)
                 
             vol_kg = float(row['final_volume_kg'])
             revenue = float(row['final_revenue'])
@@ -205,6 +221,11 @@ def fetch_sheet_metrics() -> Optional[Dict[str, Any]]:
             total_units = float(row['total_quantity'])
             order_count = int(row['created_at'])
             latest_price = float(row['price'])
+            
+            # CRITICAL FIX: Only include products with sales in the last 7 days
+            # Filter out products with zero volume to ensure we only show active products
+            if vol_kg <= 0:
+                continue  # Skip products with no sales
             
             avg_sell_price = revenue / vol_kg if vol_kg > 0 else 0.0
             
