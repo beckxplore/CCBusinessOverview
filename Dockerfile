@@ -1,68 +1,51 @@
-# Multi-stage Dockerfile for Delivery Map Analytics App
-# Stage 1: Build frontend
+# Stage 1: Build the Frontend
 FROM node:20-alpine AS frontend-builder
-
-WORKDIR /app/frontend
-
-# Copy frontend package files
+WORKDIR /app/delivery-map-app
 COPY delivery-map-app/package*.json ./
-COPY delivery-map-app/vite.config.ts ./
-COPY delivery-map-app/tsconfig*.json ./
-COPY delivery-map-app/postcss.config.js ./
-COPY delivery-map-app/tailwind.config.js ./
-COPY delivery-map-app/eslint.config.js ./
-
-# Install frontend dependencies
 RUN npm ci
-
-# Copy frontend source code
-COPY delivery-map-app/src ./src
-COPY delivery-map-app/index.html ./
-COPY delivery-map-app/public ./public
-
-# Build frontend
+COPY delivery-map-app/ ./
 RUN npm run build
 
-# Stage 2: Python backend with frontend
+# Stage 2: Build the Backend and Final Image
 FROM python:3.11-slim
-
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies for scientific Python packages
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy backend requirements
+# Copy requirements and install
 COPY delivery-map-app/backend/requirements.txt ./
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
-COPY delivery-map-app/backend ./backend
+# Maintain directory structure depth so Path(__file__).parents[2] works
+# Dev: repo_root/delivery-map-app/backend/main.py -> parents[2] is repo_root
+# Docker: /app/delivery-map-app/backend/main.py -> parents[2] is /app
+COPY delivery-map-app/backend/ ./delivery-map-app/backend/
+COPY data_points/ ./data_points/
 
-# Copy data_points directory (needed for CSV files)
-COPY data_points ./data_points
+# Copy built frontend to the location expected by main.py
+# main.py looks for: Path(__file__).parent.parent / "frontend" / "dist"
+# In Docker, this resolve to: /app/delivery-map-app/frontend/dist
+COPY --from=frontend-builder /app/delivery-map-app/dist ./delivery-map-app/frontend/dist
 
-# Copy built frontend from builder stage
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
-
-# Set working directory to backend
-WORKDIR /app/backend
-
-# Expose port
-EXPOSE 8000
-
-# Environment variables (can be overridden in docker-compose)
+# Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
+ENV FRONTEND_DIST_OVERRIDE=/app/delivery-map-app/frontend/dist
 
-# Health check
+# Expose the application port
+EXPOSE 8000
+
+# Set working directory to backend for execution
+WORKDIR /app/delivery-map-app/backend
+
+# Use httpx for a reliable health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/api/health')" || exit 1
+    CMD python -c "import httpx; httpx.get('http://localhost:8000/api/health').raise_for_status()" || exit 1
 
 # Run the application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-
